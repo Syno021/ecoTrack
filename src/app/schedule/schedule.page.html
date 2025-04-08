@@ -75,41 +75,42 @@
   
   <h4 class="section-title">All Collections</h4>
   <ion-list>
-    <ion-item *ngFor="let schedule of filteredSchedules" class="schedule-item">
-      <ion-avatar slot="start" [ngClass]="'waste-avatar-' + getWasteColor(schedule.wasteType)">
-        <ion-icon [name]="getIcon(schedule.wasteType)" class="avatar-icon"></ion-icon>
-      </ion-avatar>
-      <ion-label>
-        <h2>{{ schedule.location }}</h2>
-        <p class="schedule-date">
-          <ion-icon name="calendar-outline"></ion-icon>
-          {{ schedule.date | date: 'EEE, MMM d' }} • {{ schedule.time }}
-        </p>
-        <p class="schedule-type">{{ schedule.wasteType }}</p>
-      </ion-label>
-      <ion-button fill="clear" (click)="expandSchedule(schedule)">
-        <ion-icon [name]="schedule.expanded ? 'chevron-up' : 'chevron-down'"></ion-icon>
-      </ion-button>
-    </ion-item>
+    <ng-container *ngFor="let schedule of filteredSchedules">
+      <ion-item class="schedule-item">
+        <ion-avatar slot="start" [ngClass]="'waste-avatar-' + getWasteColor(schedule.wasteType)">
+          <ion-icon [name]="getIcon(schedule.wasteType)" class="avatar-icon"></ion-icon>
+        </ion-avatar>
+        <ion-label>
+          <h2>{{ schedule.location }}</h2>
+          <p class="schedule-date">
+            <ion-icon name="calendar-outline"></ion-icon>
+            {{ schedule.date | date: 'EEE, MMM d' }} • {{ schedule.time }}
+          </p>
+          <p class="schedule-type">{{ schedule.wasteType }}</p>
+        </ion-label>
+        <ion-button fill="clear" (click)="schedule.expanded = !schedule.expanded">
+          <ion-icon [name]="schedule.expanded ? 'chevron-up' : 'chevron-down'"></ion-icon>
+        </ion-button>
+      </ion-item>
+      
+      <!-- Expanded details appear directly under the item -->
+      <ion-card *ngIf="schedule.expanded" class="expanded-card">
+        <ion-card-content>
+          <p>{{ schedule.description }}</p>
+          <div class="button-group">
+            <ion-button fill="outline" color="tertiary" (click)="viewOnMap(schedule)">
+              <ion-icon name="map-outline" slot="start"></ion-icon>
+              View on Map
+            </ion-button>
+            <ion-button fill="outline" color="primary" (click)="addToCalendar(schedule)">
+              <ion-icon name="calendar-outline" slot="start"></ion-icon>
+              Add to Calendar
+            </ion-button>
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </ng-container>
   </ion-list>
-  
-  <div class="expanded-details" *ngIf="selectedSchedule">
-    <ion-card>
-      <ion-card-content>
-        <p>{{ selectedSchedule.description }}</p>
-        <div class="button-group">
-          <ion-button fill="outline" color="tertiary" (click)="viewOnMap(selectedSchedule)">
-            <ion-icon name="map-outline" slot="start"></ion-icon>
-            View on Map
-          </ion-button>
-          <ion-button fill="outline" color="primary" (click)="addToCalendar(selectedSchedule)">
-            <ion-icon name="calendar-outline" slot="start"></ion-icon>
-            Add to Calendar
-          </ion-button>
-        </div>
-      </ion-card-content>
-    </ion-card>
-  </div>
   
   <ion-text *ngIf="filteredSchedules.length === 0" color="medium">
     <div class="empty-state">

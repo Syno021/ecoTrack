@@ -1,0 +1,55 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-title>EcoScan: Waste Identifier</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Waste Recognition</ion-card-title>
+      <ion-card-subtitle>Upload an image to identify waste type</ion-card-subtitle>
+    </ion-card-header>
+    
+    <ion-card-content>
+      <input type="file" accept="image/*" capture="camera" (change)="onImageSelected($event)" hidden #fileInput>
+      
+      <div class="image-upload-container" (click)="fileInput.click()">
+        <ng-container *ngIf="imagePreview; else placeholder">
+          <img [src]="imagePreview" alt="Waste image preview" class="preview-image" />
+          <p class="instruction-text">Tap to change image</p>
+        </ng-container>
+        <ng-template #placeholder>
+          <ion-icon name="camera" class="upload-icon"></ion-icon>
+          <p>Tap to take or select a photo</p>
+          <p class="instruction-text">Choose a clear image of the waste item</p>
+        </ng-template>
+      </div>
+      
+      <ion-button 
+        expand="block" 
+        color="secondary" 
+        class="action-button"
+        (click)="recognizeWaste()" 
+        [disabled]="!imagePreview">
+        <ion-icon slot="start" name="search-outline"></ion-icon>
+        Identify Waste Type
+      </ion-button>
+      
+      <div *ngIf="detectedWaste" class="result-card" [ngStyle]="{'background-color': 'rgba(var(--ion-color-' + getWasteColor(detectedWaste) + '-rgb), 0.1)'}">
+        <ion-icon [name]="getWasteIcon(detectedWaste)" [color]="getWasteColor(detectedWaste)" class="result-icon"></ion-icon>
+        <p class="waste-type">{{ detectedWaste }}</p>
+        <p>{{ wasteDescription }}</p>
+        
+        <ion-button 
+          fill="outline" 
+          size="small" 
+          [color]="getWasteColor(detectedWaste)" 
+          (click)="resetImage()">
+          <ion-icon slot="start" name="refresh-outline"></ion-icon>
+          Scan New Item
+        </ion-button>
+      </div>
+    </ion-card-content>
+  </ion-card>
+</ion-content>

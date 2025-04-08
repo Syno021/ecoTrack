@@ -1,0 +1,70 @@
+.image-upload-container {
+    text-align: center;
+    padding: 40px;
+    border: 2px dashed var(--ion-color-primary-tint);
+    border-radius: 16px;
+    margin-bottom: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background-color: rgba(var(--ion-color-primary-rgb), 0.05);
+  }
+  
+  .image-upload-container:hover {
+    background-color: rgba(var(--ion-color-primary-rgb), 0.1);
+    border-color: var(--ion-color-primary);
+  }
+  
+  .upload-icon {
+    font-size: 4rem;
+    color: var(--ion-color-primary);
+    margin-bottom: 12px;
+  }
+  
+  .preview-image {
+    width: 100%;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    object-fit: cover;
+    max-height: 300px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  .result-card {
+    margin-top: 25px;
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    animation: fadeIn 0.5s ease-in-out;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  .result-icon {
+    font-size: 3.5rem;
+    margin-bottom: 12px;
+  }
+  
+  .waste-type {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  
+  .instruction-text {
+    margin-top: 10px;
+    color: var(--ion-color-medium);
+    font-size: 0.9rem;
+  }
+  
+  .action-button {
+    --border-radius: 12px;
+    margin-top: 15px;
+    --box-shadow: 0 4px 12px rgba(var(--ion-color-secondary-rgb), 0.3);
+    height: 48px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+  }

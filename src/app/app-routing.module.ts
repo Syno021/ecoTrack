@@ -10,7 +10,27 @@ const routes: Routes = [
     path: '',
     redirectTo: 'home',
     pathMatch: 'full'
+  },  {
+    path: 'auth',
+    loadChildren: () => import('./auth/auth.module').then( m => m.AuthPageModule)
   },
+  {
+    path: 'manage-dump',
+    loadChildren: () => import('./manage-dump/manage-dump.module').then( m => m.ManageDumpPageModule)
+  },
+  {
+    path: 'schedule',
+    loadChildren: () => import('./schedule/schedule.module').then( m => m.SchedulePageModule)
+  },
+  {
+    path: 'admin',
+    loadChildren: () => import('./admin/admin.module').then( m => m.AdminPageModule)
+  },
+  {
+    path: 'image-recognition',
+    loadChildren: () => import('./image-recognition/image-recognition.module').then( m => m.ImageRecognitionPageModule)
+  },
+
 ];
 
 @NgModule({

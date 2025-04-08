@@ -1,0 +1,215 @@
+ion-header ion-title {
+  display: flex;
+  align-items: center;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.header-icon {
+  margin-right: 8px;
+  font-size: 1.2rem;
+}
+
+ion-segment {
+  --background: var(--ion-color-light);
+  border-radius: 12px;
+  padding: 3px;
+  margin-top: 10px;
+}
+
+ion-segment-button {
+  --color: var(--ion-color-medium);
+  --color-checked: var(--ion-color-primary);
+  --indicator-color: var(--ion-color-primary-contrast);
+  min-height: 30px;
+  text-transform: none;
+  font-size: 0.8rem;
+  border-radius: 8px;
+}
+
+.section-title {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--ion-color-dark);
+  margin-bottom: 10px;
+  margin-top: 20px;
+  padding-left: 8px;
+  border-left: 4px solid var(--ion-color-primary);
+}
+
+.featured-card {
+  border-radius: 16px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  border: none;
+  margin-bottom: 24px;
+}
+
+.featured-card ion-card-header {
+  background: linear-gradient(135deg, var(--ion-color-primary-shade), var(--ion-color-primary));
+  color: white;
+  padding: 16px;
+}
+
+.featured-card ion-card-title {
+  color: white;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.featured-card ion-card-subtitle {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+}
+
+.card-header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.date-badge {
+  font-size: 0.9rem;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.waste-icon {
+  margin-right: 6px;
+}
+
+.schedule-details {
+  padding: 10px 0;
+  margin-bottom: 15px;
+}
+
+.detail-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  color: var(--ion-color-dark);
+}
+
+.detail-item ion-icon {
+  margin-right: 10px;
+  color: var(--ion-color-primary);
+  font-size: 1.1rem;
+}
+
+ion-item.schedule-item {
+  --padding-start: 8px;
+  --inner-padding-end: 8px;
+  --background: var(--ion-color-light-tint);
+  border-radius: 12px;
+  margin-bottom: 8px;
+  --detail-icon-color: var(--ion-color-medium);
+  --detail-icon-opacity: 1;
+  --detail-icon-font-size: 20px;
+}
+
+ion-avatar.waste-avatar-primary {
+  background-color: rgba(var(--ion-color-primary-rgb), 0.15);
+}
+
+ion-avatar.waste-avatar-success {
+  background-color: rgba(var(--ion-color-success-rgb), 0.15);
+}
+
+ion-avatar.waste-avatar-danger {
+  background-color: rgba(var(--ion-color-danger-rgb), 0.15);
+}
+
+ion-avatar.waste-avatar-medium {
+  background-color: rgba(var(--ion-color-medium-rgb), 0.15);
+}
+
+.avatar-icon {
+  color: var(--ion-color-dark);
+  font-size: 1.2rem;
+}
+
+.schedule-date {
+  font-size: 0.8rem;
+  color: var(--ion-color-medium);
+  display: flex;
+  align-items: center;
+  margin: 4px 0;
+}
+
+.schedule-date ion-icon {
+  margin-right: 5px;
+  font-size: 0.9rem;
+}
+
+.schedule-type {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--ion-color-dark);
+}
+
+.expanded-details {
+  margin-bottom: 12px;
+}
+
+.expanded-details ion-card {
+  margin: 0 8px;
+  box-shadow: none;
+  border: 1px solid var(--ion-color-light-shade);
+  border-radius: 0 0 16px 16px;
+  margin-top: -8px;
+}
+
+.button-group {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 12px;
+}
+
+.button-group ion-button {
+  margin: 0;
+  width: 48%;
+  font-size: 0.8rem;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.empty-icon {
+  font-size: 4rem;
+  margin-bottom: 16px;
+  color: var(--ion-color-medium);
+  opacity: 0.6;
+}
+
+.empty-state p {
+  margin-bottom: 16px;
+  color: var(--ion-color-medium);
+}
+
+ion-fab-button {
+  --box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+@media (prefers-color-scheme: dark) {
+  .featured-card ion-card-header {
+    background: linear-gradient(135deg, var(--ion-color-primary), var(--ion-color-primary-tint));
+  }
+  
+  ion-item.schedule-item {
+    --background: rgba(var(--ion-color-dark-rgb), 0.3);
+  }
+  
+  .expanded-details ion-card {
+    border: 1px solid rgba(var(--ion-color-dark-rgb), 0.3);
+  }
+}

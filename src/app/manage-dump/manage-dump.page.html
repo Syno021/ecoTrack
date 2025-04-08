@@ -1,13 +1,173 @@
 <ion-header [translucent]="true">
   <ion-toolbar color="primary">
-    <ion-title>manage-dump</ion-title>
+    <ion-title>Manage Dump</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
+<ion-content [fullscreen]="true" class="ion-padding">
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">manage-dump</ion-title>
+      <ion-title size="large">Manage Dump</ion-title>
     </ion-toolbar>
   </ion-header>
+
+  <ion-segment [(ngModel)]="selectedSegment" color="primary" class="ion-margin-bottom">
+    <ion-segment-button value="request">
+      <ion-label>Request Pickup</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="report">
+      <ion-label>Report Issues</ion-label>
+    </ion-segment-button>
+  </ion-segment>
+
+  <!-- Request Dump Pickup Section -->
+  <div *ngIf="selectedSegment === 'request'">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title color="secondary">Request Dump Pickup</ion-card-title>
+        <ion-card-subtitle>Schedule a pickup for your waste</ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content>
+        <form (ngSubmit)="submitPickupRequest()">
+          <ion-item>
+            <ion-label position="floating">Full Name</ion-label>
+            <ion-input type="text" [(ngModel)]="pickupRequest.name" name="name" required></ion-input>
+          </ion-item>
+          
+          <ion-item>
+            <ion-label position="floating">Phone Number</ion-label>
+            <ion-input type="tel" [(ngModel)]="pickupRequest.phone" name="phone" required></ion-input>
+          </ion-item>
+          
+          <ion-item>
+            <ion-label position="floating">Address</ion-label>
+            <ion-textarea rows="3" [(ngModel)]="pickupRequest.address" name="address" required></ion-textarea>
+          </ion-item>
+          
+          <ion-item>
+            <ion-label>Preferred Date</ion-label>
+            <ion-datetime displayFormat="MMM DD, YYYY" [(ngModel)]="pickupRequest.date" name="date" required></ion-datetime>
+          </ion-item>
+          
+          <ion-item>
+            <ion-label>Waste Type</ion-label>
+            <ion-select [(ngModel)]="pickupRequest.wasteType" name="wasteType" required>
+              <ion-select-option value="household">Household Waste</ion-select-option>
+              <ion-select-option value="garden">Garden Waste</ion-select-option>
+              <ion-select-option value="construction">Construction Debris</ion-select-option>
+              <ion-select-option value="hazardous">Hazardous Materials</ion-select-option>
+              <ion-select-option value="other">Other</ion-select-option>
+            </ion-select>
+          </ion-item>
+          
+          <ion-item *ngIf="pickupRequest.wasteType === 'other'">
+            <ion-label position="floating">Please Specify</ion-label>
+            <ion-input type="text" [(ngModel)]="pickupRequest.otherWasteType" name="otherWasteType"></ion-input>
+          </ion-item>
+          
+          <ion-item>
+            <ion-label position="floating">Additional Notes</ion-label>
+            <ion-textarea rows="4" [(ngModel)]="pickupRequest.notes" name="notes"></ion-textarea>
+          </ion-item>
+          
+          <div class="ion-padding">
+            <ion-button expand="block" type="submit" color="tertiary">
+              <ion-icon name="calendar-outline" slot="start"></ion-icon>
+              Schedule Pickup
+            </ion-button>
+          </div>
+        </form>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  <!-- Report Dump Issues Section -->
+  <div *ngIf="selectedSegment === 'report'">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title color="secondary">Report Dump Issues</ion-card-title>
+        <ion-card-subtitle>Let us know about any problems with waste disposal</ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content>
+        <form (ngSubmit)="submitIssueReport()">
+          <ion-item>
+            <ion-label position="floating">Your Name</ion-label>
+            <ion-input type="text" [(ngModel)]="issueReport.name" name="name" required></ion-input>
+          </ion-item>
+          
+          <ion-item>
+            <ion-label position="floating">Contact Email</ion-label>
+            <ion-input type="email" [(ngModel)]="issueReport.email" name="email" required></ion-input>
+          </ion-item>
+          
+          <ion-item>
+            <ion-label position="floating">Phone Number (Optional)</ion-label>
+            <ion-input type="tel" [(ngModel)]="issueReport.phone" name="phone"></ion-input>
+          </ion-item>
+          
+          <ion-item>
+            <ion-label>Issue Type</ion-label>
+            <ion-select [(ngModel)]="issueReport.issueType" name="issueType" required>
+              <ion-select-option value="missed">Missed Pickup</ion-select-option>
+              <ion-select-option value="spillage">Waste Spillage</ion-select-option>
+              <ion-select-option value="illegal">Illegal Dumping</ion-select-option>
+              <ion-select-option value="overflow">Bin Overflow</ion-select-option>
+              <ion-select-option value="service">Service Complaint</ion-select-option>
+              <ion-select-option value="other">Other</ion-select-option>
+            </ion-select>
+          </ion-item>
+          
+          <ion-item>
+            <ion-label position="floating">Issue Location</ion-label>
+            <ion-textarea rows="3" [(ngModel)]="issueReport.location" name="location" required></ion-textarea>
+          </ion-item>
+          
+          <ion-item>
+            <ion-label>Date Issue Observed</ion-label>
+            <ion-datetime displayFormat="MMM DD, YYYY" [(ngModel)]="issueReport.date" name="date" required></ion-datetime>
+          </ion-item>
+          
+          <ion-item>
+            <ion-label position="floating">Issue Description</ion-label>
+            <ion-textarea rows="4" [(ngModel)]="issueReport.description" name="description" required></ion-textarea>
+          </ion-item>
+          
+          <ion-item>
+            <ion-label>Priority Level</ion-label>
+            <ion-select [(ngModel)]="issueReport.priority" name="priority" required>
+              <ion-select-option value="low">Low - Not urgent</ion-select-option>
+              <ion-select-option value="medium">Medium - Needs attention soon</ion-select-option>
+              <ion-select-option value="high">High - Urgent issue</ion-select-option>
+            </ion-select>
+          </ion-item>
+          
+          <ion-item>
+            <ion-label>Add Photos</ion-label>
+            <ion-button fill="outline" size="small" (click)="takePicture()">
+              <ion-icon name="camera-outline" slot="start"></ion-icon>
+              Take Photo
+            </ion-button>
+          </ion-item>
+          
+          <ion-row *ngIf="issueReport.photos && issueReport.photos.length > 0">
+            <ion-col size="4" *ngFor="let photo of issueReport.photos; let i = index">
+              <ion-thumbnail>
+                <img [src]="photo">
+              </ion-thumbnail>
+              <ion-button fill="clear" color="danger" size="small" (click)="removePhoto(i)">
+                <ion-icon name="trash-outline"></ion-icon>
+              </ion-button>
+            </ion-col>
+          </ion-row>
+          
+          <div class="ion-padding">
+            <ion-button expand="block" type="submit" color="danger">
+              <ion-icon name="warning-outline" slot="start"></ion-icon>
+              Submit Report
+            </ion-button>
+          </div>
+        </form>
+      </ion-card-content>
+    </ion-card>
+  </div>
 </ion-content>

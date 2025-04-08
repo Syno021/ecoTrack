@@ -7,10 +7,14 @@ import { Component, OnInit } from '@angular/core';
   standalone: false,
 })
 export class AuthPage implements OnInit {
+  activeTab: string = 'login';
 
   constructor() { }
 
   ngOnInit() {
   }
 
+  switchTab(tabName: string) {
+    this.activeTab = tabName;
+  }
 }

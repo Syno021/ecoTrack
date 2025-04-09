@@ -1,3 +1,36 @@
 <ion-app>
-  <ion-router-outlet></ion-router-outlet>
+  <!-- Use ion-split-pane as the main container for both web and mobile -->
+  <ion-split-pane contentId="main-content" [when]="isWeb && !hideNavbar && 'sm'">
+    <!-- Sidebar navigation (will auto-hide on mobile and restricted pages) -->
+    <ion-menu contentId="main-content" menuId="sidebar" type="overlay" [disabled]="hideNavbar">
+      <ion-header>
+        <ion-toolbar color="primary">
+          <ion-title>Navigation</ion-title>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content>
+        <ion-list>
+          <ion-item *ngFor="let item of navItems" (click)="navigateTo(item.url)" detail="false">
+            <ion-icon slot="start" [name]="item.icon"></ion-icon>
+            <ion-label>{{ item.title }}</ion-label>
+          </ion-item>
+        </ion-list>
+      </ion-content>
+    </ion-menu>
+    
+    <!-- Main content area - used for both web and mobile -->
+    <div class="ion-page" id="main-content">
+      <ion-content>
+        <ion-router-outlet></ion-router-outlet>
+      </ion-content>
+      
+      <!-- Mobile tab bar only - hide on restricted pages -->
+      <ion-tab-bar *ngIf="!isWeb && !hideNavbar" slot="bottom">
+        <ion-tab-button *ngFor="let item of navItems" (click)="navigateTo(item.url)">
+          <ion-icon [name]="item.icon"></ion-icon>
+          <ion-label>{{ item.title }}</ion-label>
+        </ion-tab-button>
+      </ion-tab-bar>
+    </div>
+  </ion-split-pane>
 </ion-app>

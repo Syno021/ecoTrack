@@ -1,0 +1,39 @@
+.app-container {
+    display: flex;
+    width: 100%;
+    height: 100%;
+  }
+  
+  .sidebar-menu {
+    --width: 150px;
+  }
+  
+  .content-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  ion-split-pane {
+    --side-width: 150px;
+    --side-max-width: 25%;
+  }
+  
+  // Ensure content is scrollable
+  ion-content {
+    --overflow: auto;
+  }
+  
+  // Fix for tab heights
+  ion-tab-bar {
+    height: 56px;
+  }
+  
+  // Make sure the menu is visible for larger screens
+  @media (min-width: 992px) {
+    ion-menu {
+      &.menu-enabled {
+        display: block;
+      }
+    }
+  }

@@ -3,21 +3,170 @@
     <ion-buttons slot="start" *ngIf="isWeb">
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
-    <ion-title>
-      Blank
-    </ion-title>
+    <ion-title>EcoTrack</ion-title>
+    <ion-buttons slot="end">
+      <ion-button>
+        <ion-icon slot="icon-only" name="notifications-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
+<ion-content [fullscreen]="true" class="ion-padding">
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">Blank</ion-title>
+      <ion-title size="large">EcoTrack</ion-title>
     </ion-toolbar>
   </ion-header>
-
-  <div id="container">
-    <strong>Ready to create an app?</strong>
-    <p>Start with Ionic <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
+  
+  <!-- Hero Card -->
+  <ion-card class="hero-card animate-in">
+    <ion-card-header>
+      <div class="header-container">
+        <ion-avatar class="header-image">
+          <img src="assets/icon/eco-logo.png" alt="EcoTrack Logo" 
+               onError="this.src='assets/icon/favicon.png'">
+        </ion-avatar>
+        <div>
+          <ion-card-title>Welcome to EcoTrack</ion-card-title>
+          <ion-card-subtitle>Your guide to a cleaner, greener future</ion-card-subtitle>
+        </div>
+      </div>
+    </ion-card-header>
+    <ion-card-content>
+      Track your environmental impact, dispose of waste properly, and help create a sustainable community.
+      
+      <div class="action-row">
+        <ion-button expand="block" fill="solid" color="light" routerLink="/request-pickup">
+          <ion-icon name="navigate-outline" slot="start"></ion-icon>
+          Get Started
+        </ion-button>
+      </div>
+    </ion-card-content>
+  </ion-card>
+  
+  <!-- Stats Section -->
+  <div class="app-section animate-in" style="animation-delay: 0.1s">
+    <div class="eco-stats">
+      <div class="stat-item" *ngFor="let stat of stats">
+        <div class="stat-value">{{stat.value}}</div>
+        <div class="stat-label">{{stat.label}}</div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Features Section -->
+  <div class="app-section animate-in" style="animation-delay: 0.2s">
+    <div class="section-header">How EcoTrack Helps</div>
+    
+    <ion-list lines="none" class="feature-grid">
+      <ion-item>
+        <div class="icon-circle success-bg" slot="start">
+          <ion-icon name="leaf-outline" color="success"></ion-icon>
+        </div>
+        <ion-label>
+          <h3>Better Waste Separation</h3>
+          <p>Learn proper recycling techniques to maximize environmental impact.</p>
+          <span class="feature-badge" style="background: rgba(var(--ion-color-success-rgb), 0.15); color: var(--ion-color-success)">Eco-friendly</span>
+        </ion-label>
+      </ion-item>
+      
+      <ion-item>
+        <div class="icon-circle danger-bg" slot="start">
+          <ion-icon name="trash-outline" color="danger"></ion-icon>
+        </div>
+        <ion-label>
+          <h3>Easy Pickup Requests</h3>
+          <p>Schedule collection for recyclables, organic or hazardous waste.</p>
+          <span class="feature-badge" style="background: rgba(var(--ion-color-danger-rgb), 0.15); color: var(--ion-color-danger)">Time-saving</span>
+        </ion-label>
+      </ion-item>
+      
+      <ion-item>
+        <div class="icon-circle warning-bg" slot="start">
+          <ion-icon name="warning-outline" color="warning"></ion-icon>
+        </div>
+        <ion-label>
+          <h3>Report Illegal Dumping</h3>
+          <p>Take a photo and alert the authorities instantly with location data.</p>
+          <span class="feature-badge" style="background: rgba(var(--ion-color-warning-rgb), 0.15); color: var(--ion-color-warning)">Community</span>
+        </ion-label>
+      </ion-item>
+      
+      <ion-item>
+        <div class="icon-circle tertiary-bg" slot="start">
+          <ion-icon name="earth-outline" color="tertiary"></ion-icon>
+        </div>
+        <ion-label>
+          <h3>Track Your Impact</h3>
+          <p>See how your actions help reduce landfill waste and protect nature.</p>
+          <span class="feature-badge" style="background: rgba(var(--ion-color-tertiary-rgb), 0.15); color: var(--ion-color-tertiary)">Analytics</span>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+  </div>
+  
+  <!-- Recycling Guide Section -->
+  <div class="app-section animate-in" style="animation-delay: 0.3s">
+    <div class="section-header">Recycling Guide</div>
+    
+    <ion-segment [(ngModel)]="selectedRecyclingSegment" (ionChange)="segmentChanged($event)" mode="md" class="ion-margin-bottom">
+      <ion-segment-button value="basics" class="segment-button">
+        <ion-label>Basics</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="materials" class="segment-button">
+        <ion-label>Materials</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="faq" class="segment-button">
+        <ion-label>FAQ</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+    
+    <!-- Recycling Basics -->
+    <div *ngIf="selectedRecyclingSegment === 'basics'">
+      <div class="recycling-tip" *ngFor="let tip of recyclingTips">
+        <div class="tip-header">
+          <ion-icon [name]="tip.icon" [color]="tip.color"></ion-icon>
+          <div class="tip-title">{{tip.title}}</div>
+        </div>
+        <div class="tip-content">{{tip.content}}</div>
+      </div>
+    </div>
+    
+    <!-- Materials Guide -->
+    <div *ngIf="selectedRecyclingSegment === 'materials'" class="recycling-grid">
+      <ion-card class="recycling-card" *ngFor="let category of recyclingCategories">
+        <ion-card-header>
+          <ion-icon [name]="category.icon" [color]="category.color" class="material-icon"></ion-icon>
+          <ion-card-title style="font-size: 1.1rem;">{{category.title}}</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          {{category.description}}
+        </ion-card-content>
+      </ion-card>
+    </div>
+    
+    <!-- FAQ Section -->
+    <div *ngIf="selectedRecyclingSegment === 'faq'">
+      <div class="accordion-group">
+        <div *ngFor="let faq of recyclingFAQs">
+          <div class="accordion-header" (click)="toggleFAQ(faq)">
+            <div class="accordion-title">{{faq.question}}</div>
+            <ion-icon [name]="faq.expanded ? 'chevron-up-outline' : 'chevron-down-outline'"></ion-icon>
+          </div>
+          <div class="accordion-content" *ngIf="faq.expanded">
+            {{faq.answer}}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Action Button -->
+  <div class="animate-in" style="animation-delay: 0.4s">
+    <ion-button expand="block" color="primary" routerLink="/request-pickup">
+      <ion-icon name="navigate-outline" slot="start"></ion-icon>
+      Request a Pickup
+    </ion-button>
   </div>
 </ion-content>

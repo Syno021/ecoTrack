@@ -123,4 +123,5 @@ export class HomePage implements OnInit {
   toggleFAQ(faq: any) {
     faq.expanded = !faq.expanded;
   }
+  
 }

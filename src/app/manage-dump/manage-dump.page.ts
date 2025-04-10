@@ -1,6 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Injector, runInInjectionContext, NgZone } from '@angular/core';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { ToastController, LoadingController } from '@ionic/angular';
+import { Router } from '@angular/router';
+import { AngularFireAuth } from '@angular/fire/compat/auth';
+import { AngularFirestore } from '@angular/fire/compat/firestore';
 
 @Component({
   selector: 'app-manage-dump',
@@ -37,33 +40,63 @@ export class ManageDumpPage implements OnInit {
     photos: [] as string[]
   };
 
+  // Add user data properties
+  currentUser: any = null;
+  userEmail: string = '';
+
   constructor(
     private toastController: ToastController,
-    private loadingController: LoadingController
+    private loadingController: LoadingController,
+    private router: Router,
+    private fireAuth: AngularFireAuth,
+    private firestore: AngularFirestore,
+    private ngZone: NgZone,
+    private injector: Injector 
   ) { }
 
-  ngOnInit() {
+  async ngOnInit() {
+    // Check authentication status
+    this.fireAuth.authState.subscribe(user => {
+      if (user) {
+        this.currentUser = user;
+        this.userEmail = user.email || '';
+      } else {
+        this.router.navigate(['/home']);
+      }
+    });
   }
 
   async submitPickupRequest() {
+    if (!this.currentUser) {
+      this.router.navigate(['/home']);
+      return;
+    }
+
     // Validate form inputs
     if (!this.pickupRequest.name || !this.pickupRequest.phone || !this.pickupRequest.address || !this.pickupRequest.wasteType) {
       this.presentToast('Please fill in all required fields', 'danger');
       return;
     }
 
-    // Show loading indicator
     const loading = await this.loadingController.create({
-      message: 'Submitting request...',
-      duration: 2000
+      message: 'Submitting request...'
     });
     await loading.present();
 
-    // Simulate API call
-    setTimeout(async () => {
+    try {
+      await this.ngZone.run(() => {
+        return runInInjectionContext(this.injector, async () => {
+          await this.firestore.collection('requests').add({
+            ...this.pickupRequest,
+            userId: this.currentUser.uid,
+            userEmail: this.userEmail,
+            createdAt: new Date(),
+            status: 'pending'
+          });
+        });
+      });
+
       await loading.dismiss();
-      
-      // Display success message
       this.presentToast('Pickup request submitted successfully!', 'success');
       
       // Reset form
@@ -76,10 +109,19 @@ export class ManageDumpPage implements OnInit {
         otherWasteType: '',
         notes: ''
       };
-    }, 2000);
+    } catch (error) {
+      await loading.dismiss();
+      this.presentToast('Error submitting request. Please try again.', 'danger');
+      console.error('Error:', error);
+    }
   }
 
   async submitIssueReport() {
+    if (!this.currentUser) {
+      this.router.navigate(['/home']);
+      return;
+    }
+
     // Validate form inputs
     if (!this.issueReport.name || !this.issueReport.email || !this.issueReport.issueType || 
         !this.issueReport.location || !this.issueReport.description) {
@@ -87,18 +129,25 @@ export class ManageDumpPage implements OnInit {
       return;
     }
 
-    // Show loading indicator
     const loading = await this.loadingController.create({
-      message: 'Submitting report...',
-      duration: 2000
+      message: 'Submitting report...'
     });
     await loading.present();
 
-    // Simulate API call
-    setTimeout(async () => {
+    try {
+      await this.ngZone.run(() => {
+        return runInInjectionContext(this.injector, async () => {
+          await this.firestore.collection('reports').add({
+            ...this.issueReport,
+            userId: this.currentUser.uid,
+            userEmail: this.userEmail,
+            createdAt: new Date(),
+            status: 'pending'
+          });
+        });
+      });
+
       await loading.dismiss();
-      
-      // Display success message
       this.presentToast('Issue report submitted successfully!', 'success');
       
       // Reset form
@@ -113,7 +162,11 @@ export class ManageDumpPage implements OnInit {
         priority: 'medium',
         photos: []
       };
-    }, 2000);
+    } catch (error) {
+      await loading.dismiss();
+      this.presentToast('Error submitting report. Please try again.', 'danger');
+      console.error('Error:', error);
+    }
   }
 
   async takePicture() {

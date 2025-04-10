@@ -52,10 +52,14 @@
           <ion-item>
             <ion-label>Waste Type</ion-label>
             <ion-select [(ngModel)]="pickupRequest.wasteType" name="wasteType" required>
-              <ion-select-option value="household">Household Waste</ion-select-option>
+              <ion-select-option value="household">Recycling</ion-select-option>
               <ion-select-option value="garden">Garden Waste</ion-select-option>
               <ion-select-option value="construction">Construction Debris</ion-select-option>
               <ion-select-option value="hazardous">Hazardous Materials</ion-select-option>
+              <ion-select-option value="household">Household Waste</ion-select-option>
+              <ion-select-option value="garden">Solid Waste</ion-select-option>
+              <ion-select-option value="construction">Liquid Waste</ion-select-option>
+              <ion-select-option value="hazardous">Chemical Waste</ion-select-option>
               <ion-select-option value="other">Other</ion-select-option>
             </ion-select>
           </ion-item>

@@ -1,14 +1,17 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Injector, runInInjectionContext, NgZone } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import { ToastController, ModalController, LoadingController, RefresherEventDetail } from '@ionic/angular';
+import { ToastController, ModalController, LoadingController } from '@ionic/angular';
+import { AngularFirestore } from '@angular/fire/compat/firestore';
 
 interface Schedule {
-  id: number;
+  id: string;
   location: string;
-  date: Date;
+  address: string;
+  date: any; // Firestore timestamp
   time: string;
   wasteType: string;
   description: string;
+  status: 'active' | 'cancelled';
   expanded?: boolean;
 }
 
@@ -19,49 +22,7 @@ interface Schedule {
   standalone: false,
 })
 export class SchedulePage implements OnInit {
-  schedules: Schedule[] = [
-    {
-      id: 1,
-      location: 'KwaMashu Zone 5',
-      date: new Date('2025-04-10'),
-      time: '08:00 AM',
-      wasteType: 'Recyclable Waste',
-      description: 'Collecting plastics, paper, glass, and cans.'
-    },
-    {
-      id: 2,
-      location: 'Umlazi V Section',
-      date: new Date('2025-04-12'),
-      time: '10:00 AM',
-      wasteType: 'Organic Waste',
-      description: 'Collecting food waste and yard trimmings.'
-    },
-    {
-      id: 3,
-      location: 'Durban CBD',
-      date: new Date('2025-04-15'),
-      time: '12:00 PM',
-      wasteType: 'Hazardous Waste',
-      description: 'Special collection for expired batteries and chemicals.'
-    },
-    {
-      id: 4,
-      location: 'Phoenix',
-      date: new Date('2025-04-18'),
-      time: '09:00 AM',
-      wasteType: 'Recyclable Waste',
-      description: 'Collection of paper, cardboard, and plastic containers.'
-    },
-    {
-      id: 5,
-      location: 'Chatsworth',
-      date: new Date('2025-04-20'),
-      time: '11:00 AM',
-      wasteType: 'Organic Waste',
-      description: 'Garden waste and compostable materials collection.'
-    }
-  ];
-  
+  schedules: Schedule[] = [];
   filteredSchedules: Schedule[] = [];
   upcomingSchedule: Schedule | null = null;
   selectedSchedule: Schedule | null = null;
@@ -71,13 +32,49 @@ export class SchedulePage implements OnInit {
     private sanitizer: DomSanitizer,
     private toastController: ToastController,
     private modalController: ModalController,
-    private loadingController: LoadingController
+    private loadingController: LoadingController,
+    private firestore: AngularFirestore,
+    private ngZone: NgZone,
+    private injector: Injector 
   ) {}
 
   ngOnInit() {
-    this.sortSchedules();
-    this.filterSchedules();
-    this.findUpcomingSchedule();
+    this.loadSchedules();
+  }
+
+  async loadSchedules() {
+    const loading = await this.loadingController.create({
+      message: 'Loading schedules...'
+    });
+    await loading.present();
+
+    try {
+      await this.ngZone.run(() => {
+        return runInInjectionContext(this.injector, async () => {
+          this.firestore.collection('schedules', ref => 
+            ref.where('status', '==', 'active')
+          ).valueChanges({ idField: 'id' })
+          .subscribe((data: any[]) => {
+            this.schedules = data.map(item => ({
+              ...item,
+              date: item.date?.seconds ? new Date(item.date.seconds * 1000) : new Date()
+            }));
+            this.sortSchedules();
+            this.filterSchedules();
+            this.findUpcomingSchedule();
+            loading.dismiss();
+          }, error => {
+            console.error('Error loading schedules:', error);
+            this.presentToast('Error loading schedules');
+            loading.dismiss();
+          });
+        });
+      });
+    } catch (error) {
+      console.error('Error in loadSchedules:', error);
+      this.presentToast('Error loading schedules');
+      loading.dismiss();
+    }
   }
 
   sortSchedules() {
@@ -199,18 +196,18 @@ export class SchedulePage implements OnInit {
   }
 
   async refreshSchedules(event?: any) {
-    // Simulate refresh
-    setTimeout(() => {
-      this.sortSchedules();
-      this.filterSchedules();
-      this.findUpcomingSchedule();
-      
+    try {
+      await this.loadSchedules();
       if (event) {
         event.target.complete();
       }
-      
       this.presentToast('Schedule updated');
-    }, 1000);
+    } catch (error) {
+      this.presentToast('Error refreshing schedules');
+      if (event) {
+        event.target.complete();
+      }
+    }
   }
 
   openNotificationSettings() {

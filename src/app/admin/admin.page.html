@@ -158,9 +158,14 @@
             <ion-input [(ngModel)]="newLocation.address" name="address" required></ion-input>
           </ion-item>
 
+          <!-- Replace ion-datetime with ion-select for weekdays -->
           <ion-item>
-            <ion-label position="stacked">Date</ion-label>
-            <ion-datetime [(ngModel)]="newLocation.date" name="date" display-format="MMM DD YYYY" required></ion-datetime>
+            <ion-label position="floating">Collection Day</ion-label>
+            <ion-select [(ngModel)]="newLocation.weekday" name="weekday" required>
+              <ion-select-option *ngFor="let day of weekdays" [value]="day">
+                {{day}}
+              </ion-select-option>
+            </ion-select>
           </ion-item>
 
           <ion-item>
@@ -198,7 +203,7 @@
         <ion-label>
           <h2>{{location.location}}</h2>
           <p>{{location.address}}</p>
-          <p>Date: {{location.date | date:'mediumDate'}} at {{location.time}}</p>
+          <p>Schedule: Every {{location.weekday}} at {{location.time}}</p>
           <p>Waste Type: {{location.wasteType | titlecase}}</p>
           <p>Status: {{location.status}}</p>
         </ion-label>

@@ -9,7 +9,7 @@ interface PickupLocation {
   location: string;  // formerly 'name'
   address: string;
   wasteType: string;  // single waste type per schedule
-  date: Date;
+  weekday: string;  // changed from date
   time: string;
   description: string;
   status: 'active' | 'cancelled';
@@ -37,13 +37,14 @@ export class AdminPage implements OnInit {
     location: '',
     address: '',
     wasteType: '',
-    date: new Date(),
+    weekday: '',
     time: '',
     description: '',
     status: 'active'
   };
   pickupLocations: PickupLocation[] = [];
   wasteTypes = ['recyclable', 'organic', 'hazardous'];
+  weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
   
   constructor(
     private fireAuth: AngularFireAuth,
@@ -182,7 +183,7 @@ export class AdminPage implements OnInit {
             updatedAt: new Date()
           });
 
-          this.presentToast('Collection schedule created successfully', 'success');
+          this.presentToast('Weekly collection schedule created successfully', 'success');
           
           // Reset form
           this.newLocation = {
@@ -190,7 +191,7 @@ export class AdminPage implements OnInit {
             location: '',
             address: '',
             wasteType: '',
-            date: new Date(),
+            weekday: '',
             time: '',
             description: '',
             status: 'active'

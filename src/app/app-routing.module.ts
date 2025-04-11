@@ -30,6 +30,10 @@ const routes: Routes = [
     path: 'image-recognition',
     loadChildren: () => import('./image-recognition/image-recognition.module').then( m => m.ImageRecognitionPageModule)
   },
+  {
+    path: 'responses',
+    loadChildren: () => import('./responses/responses.module').then( m => m.ResponsesPageModule)
+  },
 
 ];
 

@@ -12,6 +12,11 @@ import { filter } from 'rxjs/operators';
 export class AppComponent {
   public navItems = [
     {
+      title: 'home',
+      url: '/home',
+      icon: 'home'
+    },
+    {
       title: 'Manage Dump',
       url: '/manage-dump',
       icon: 'trash-bin'
@@ -25,7 +30,12 @@ export class AppComponent {
       title: 'Image Recognition',
       url: '/image-recognition',
       icon: 'camera'
-    }
+    },
+    {
+      title: 'Feedback',
+      url: '/responses',
+      icon: 'bookmark'
+    },
   ];
   
   // Flag to check if the app is being viewed on web

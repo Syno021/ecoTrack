@@ -1,6 +1,10 @@
 /* Component */
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, NgZone, Injector } from '@angular/core';
 import { AnimationController, LoadingController } from '@ionic/angular';
+import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
+import { AngularFireAuth } from '@angular/fire/compat/auth';
+import { AngularFirestore } from '@angular/fire/compat/firestore';
+import { runInInjectionContext } from '@angular/core';
 
 @Component({
   selector: 'app-image-recognition',
@@ -15,20 +19,75 @@ export class ImageRecognitionPage implements OnInit {
   
   constructor(
     private loadingCtrl: LoadingController,
-    private animationCtrl: AnimationController
+    private animationCtrl: AnimationController,
+    private afs: AngularFirestore,
+    private afAuth: AngularFireAuth,
+    private ngZone: NgZone,
+    private injector: Injector
   ) {}
 
   ngOnInit() {}
 
+  async takePhoto() {
+    try {
+      const image = await Camera.getPhoto({
+        quality: 90,
+        allowEditing: false,
+        resultType: CameraResultType.DataUrl,
+        source: CameraSource.Camera
+      });
+      
+      this.imagePreview = image.dataUrl ?? null;
+      if (image.dataUrl) {
+        await this.uploadImage(image.dataUrl);
+      } else {
+        console.error('Image data URL is undefined.');
+      }
+    } catch (error) {
+      console.error('Error taking photo:', error);
+    }
+  }
+
+  async uploadImage(dataUrl: string) {
+    const loading = await this.loadingCtrl.create({
+      message: 'Uploading image...',
+      spinner: 'circular'
+    });
+    await loading.present();
+
+    try {
+      const timestamp = Date.now();
+      const currentUser = await this.afAuth.currentUser;
+
+      await this.ngZone.run(() => {
+        return runInInjectionContext(this.injector, async () => {
+          await this.afs.collection('images').add({
+            imageData: dataUrl,
+            timestamp: timestamp,
+            wasteType: this.detectedWaste,
+            description: this.wasteDescription,
+            userId: currentUser?.uid || null,
+            userEmail: currentUser?.email || null
+          });
+        });
+      });
+
+    } catch (error) {
+      console.error('Error saving image:', error);
+    } finally {
+      loading.dismiss();
+    }
+  }
+
   async onImageSelected(event: any) {
     const file = event.target.files[0];
     if (file) {
-      // Reset previous result
       this.detectedWaste = null;
       
       const reader = new FileReader();
-      reader.onload = () => {
+      reader.onload = async () => {
         this.imagePreview = reader.result;
+        await this.uploadImage(reader.result as string);
       };
       reader.readAsDataURL(file);
     }

@@ -21,10 +21,19 @@
         </ng-container>
         <ng-template #placeholder>
           <ion-icon name="camera" class="upload-icon"></ion-icon>
-          <p>Tap to take or select a photo</p>
-          <p class="instruction-text">Choose a clear image of the waste item</p>
+          <p>Choose a method to add image</p>
         </ng-template>
       </div>
+
+      <ion-button expand="block" color="primary" (click)="takePhoto()">
+        <ion-icon slot="start" name="camera"></ion-icon>
+        Take Photo
+      </ion-button>
+
+      <ion-button expand="block" color="secondary" (click)="fileInput.click()">
+        <ion-icon slot="start" name="image"></ion-icon>
+        Upload from Gallery
+      </ion-button>
       
       <ion-button 
         expand="block" 

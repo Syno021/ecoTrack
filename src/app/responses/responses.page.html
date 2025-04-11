@@ -1,0 +1,56 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>My Feedback</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-segment [(ngModel)]="selectedSegment" (ionChange)="segmentChanged($event)">
+    <ion-segment-button value="reports">
+      <ion-label>Reports</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="requests">
+      <ion-label>Requests</ion-label>
+    </ion-segment-button>
+  </ion-segment>
+
+  <div *ngIf="isLoading" class="ion-text-center ion-padding">
+    <ion-spinner></ion-spinner>
+  </div>
+
+  <div *ngIf="!isLoading">
+    <!-- Reports Segment -->
+    <ion-list *ngIf="selectedSegment === 'reports'">
+      <ion-item *ngFor="let report of userReports">
+        <ion-label>
+          <h2>{{report.issueType}}</h2>
+          <p>{{report.description}}</p>
+          <ion-badge color="primary">{{report.status}}</ion-badge>
+          <p class="ion-text-end">{{report.createdAt | date}}</p>
+        </ion-label>
+      </ion-item>
+      <ion-item *ngIf="userReports.length === 0" class="ion-text-center">
+        <ion-label>No reports found</ion-label>
+      </ion-item>
+    </ion-list>
+
+    <!-- Requests Segment -->
+    <ion-list *ngIf="selectedSegment === 'requests'">
+      <ion-item *ngFor="let request of userRequests">
+        <ion-label>
+          <h2>{{request.wasteType}}</h2>
+          <p>{{request.notes}}</p>
+          <ion-badge color="primary">{{request.status}}</ion-badge>
+          <p class="ion-text-end">{{request.updatedAt | date}}</p>
+        </ion-label>
+      </ion-item>
+      <ion-item *ngIf="userRequests.length === 0" class="ion-text-center">
+        <ion-label>No requests found</ion-label>
+      </ion-item>
+    </ion-list>
+  </div>
+
+  <div *ngIf="error" class="ion-text-center ion-padding">
+    <ion-text color="danger">{{error}}</ion-text>
+  </div>
+</ion-content>

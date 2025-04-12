@@ -57,13 +57,35 @@ export class AdminPage implements OnInit {
   ) {}
 
   async ngOnInit() {
-    this.fireAuth.authState.subscribe(user => {
+    this.fireAuth.authState.subscribe(async user => {
       if (!user) {
-        this.router.navigate(['/login']);
+        this.router.navigate(['/auth']);
         return;
       }
+      
+      const isAdmin = await this.checkAdminStatus(user.uid);
+      if (!isAdmin) {
+        this.router.navigate(['/home']);
+        this.presentToast('Access denied. Admin rights required.', 'warning');
+        return;
+      }
+      
       this.loadData();
     });
+  }
+
+  private async checkAdminStatus(userId: string): Promise<boolean> {
+    try {
+      const userDoc = await this.firestore.collection('users').doc(userId).get().toPromise();
+      interface UserData {
+        status?: string;
+      }
+      const userData = userDoc?.data() as UserData;
+      return userData?.status === 'admin';
+    } catch (error) {
+      console.error('Error checking admin status:', error);
+      return false;
+    }
   }
 
   loadData() {

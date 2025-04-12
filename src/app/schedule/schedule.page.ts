@@ -1,7 +1,13 @@
 import { Component, OnInit, Injector, runInInjectionContext, NgZone } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { ToastController, ModalController, LoadingController } from '@ionic/angular';
-import { AngularFirestore } from '@angular/fire/compat/firestore';
+import { AngularFirestore, QueryDocumentSnapshot } from '@angular/fire/compat/firestore';
+import { AngularFireAuth } from '@angular/fire/compat/auth';
+
+interface UserFavorite {
+  userId: string;
+  scheduleId: string;
+}
 
 interface Schedule {
   id: string;
@@ -13,6 +19,8 @@ interface Schedule {
   description: string;
   status: 'active' | 'cancelled';
   expanded?: boolean;
+  isFavorite?: boolean;
+  userFavorites?: string[]; // Array of user IDs who favorited this schedule
 }
 
 @Component({
@@ -27,6 +35,17 @@ export class SchedulePage implements OnInit {
   upcomingSchedule: Schedule | null = null;
   selectedSchedule: Schedule | null = null;
   filter: string = 'all';
+  currentUserId: string | null = null; // Change to public by removing private keyword
+
+  // ...or alternatively, keep it private and add a public getter:
+  // private currentUserId: string | null = null;
+  // get isLoggedIn(): boolean {
+  //   return this.currentUserId !== null;
+  // }
+
+  get isLoggedIn(): boolean {
+    return this.currentUserId !== null;
+  }
 
   constructor(
     private sanitizer: DomSanitizer,
@@ -35,8 +54,16 @@ export class SchedulePage implements OnInit {
     private loadingController: LoadingController,
     private firestore: AngularFirestore,
     private ngZone: NgZone,
-    private injector: Injector 
-  ) {}
+    private injector: Injector,
+    private auth: AngularFireAuth
+  ) {
+    this.auth.user.subscribe(user => {
+      this.currentUserId = user ? user.uid : null;
+      if (this.schedules.length > 0) {
+        this.updateFavoriteStatus();
+      }
+    });
+  }
 
   ngOnInit() {
     this.loadSchedules();
@@ -54,11 +81,17 @@ export class SchedulePage implements OnInit {
           this.firestore.collection('schedules', ref => 
             ref.where('status', '==', 'active')
           ).valueChanges({ idField: 'id' })
-          .subscribe((data: any[]) => {
+          .subscribe(async (data: any[]) => {
             this.schedules = data.map(item => ({
               ...item,
-              date: item.date?.seconds ? new Date(item.date.seconds * 1000) : new Date()
+              date: item.date?.seconds ? new Date(item.date.seconds * 1000) : new Date(),
+              isFavorite: false
             }));
+
+            if (this.currentUserId) {
+              await this.updateFavoriteStatus();
+            }
+
             this.sortSchedules();
             this.filterSchedules();
             this.findUpcomingSchedule();
@@ -77,8 +110,34 @@ export class SchedulePage implements OnInit {
     }
   }
 
+  async updateFavoriteStatus() {
+    if (!this.currentUserId) return;
+
+    try {
+      await runInInjectionContext(this.injector, async () => {
+        const userFavorites = await this.firestore
+          .collection('userFavorites', ref => 
+            ref.where('userId', '==', this.currentUserId)
+          )
+          .get()
+          .toPromise();
+
+        const favoriteIds = new Set(userFavorites?.docs.map((doc: QueryDocumentSnapshot<any>) => doc.data()['scheduleId']));
+        this.schedules.forEach(schedule => {
+          schedule.isFavorite = favoriteIds.has(schedule.id);
+        });
+      });
+    } catch (error) {
+      console.error('Error updating favorites:', error);
+    }
+  }
+
   sortSchedules() {
-    this.schedules.sort((a, b) => a.date.getTime() - b.date.getTime());
+    this.schedules.sort((a, b) => {
+      if (a.isFavorite && !b.isFavorite) return -1;
+      if (!a.isFavorite && b.isFavorite) return 1;
+      return a.date.getTime() - b.date.getTime();
+    });
   }
 
   filterSchedules() {
@@ -94,9 +153,18 @@ export class SchedulePage implements OnInit {
 
   findUpcomingSchedule() {
     const now = new Date();
+    now.setHours(0, 0, 0, 0);
+    
     this.upcomingSchedule = this.schedules
-      .filter(s => s.date >= now)
+      .filter(s => {
+        const scheduleDate = new Date(s.date);
+        scheduleDate.setHours(0, 0, 0, 0);
+        return scheduleDate >= now && s.isFavorite;
+      })
       .sort((a, b) => a.date.getTime() - b.date.getTime())[0] || null;
+
+    // Force change detection
+    this.ngZone.run(() => {});
   }
 
   expandSchedule(schedule: Schedule) {
@@ -104,10 +172,7 @@ export class SchedulePage implements OnInit {
       this.selectedSchedule = null;
       schedule.expanded = false;
     } else {
-      // Reset all expanded states
       this.schedules.forEach(s => s.expanded = false);
-      
-      // Set the selected schedule
       this.selectedSchedule = schedule;
       schedule.expanded = true;
     }
@@ -116,14 +181,10 @@ export class SchedulePage implements OnInit {
   getDaysRemaining(dateStr: Date): string {
     const today = new Date();
     const collectionDate = new Date(dateStr);
-    
-    // Set both dates to midnight for accurate day calculation
     today.setHours(0, 0, 0, 0);
     collectionDate.setHours(0, 0, 0, 0);
-    
     const diffTime = collectionDate.getTime() - today.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
     if (diffDays === 0) {
       return 'Today';
     } else if (diffDays === 1) {
@@ -163,7 +224,6 @@ export class SchedulePage implements OnInit {
     const query = encodeURIComponent(schedule.location + ', Durban, South Africa');
     const mapUrl = `https://www.google.com/maps/search/?api=1&query=${query}`;
     window.open(mapUrl, '_blank');
-    
     this.presentToast(`Opening map for ${schedule.location}`);
   }
 
@@ -178,8 +238,6 @@ export class SchedulePage implements OnInit {
       duration: 800
     });
     await loading.present();
-    
-    // Simulating calendar integration
     setTimeout(() => {
       this.presentToast(`${schedule.wasteType} collection at ${schedule.location} added to your calendar`);
     }, 1000);
@@ -212,5 +270,61 @@ export class SchedulePage implements OnInit {
 
   openNotificationSettings() {
     this.presentToast('Notification settings will be available soon');
+  }
+
+  async toggleFavorite(schedule: Schedule) {
+    if (!this.currentUserId) {
+      this.presentToast('Please log in to add favorites');
+      return;
+    }
+
+    try {
+      await runInInjectionContext(this.injector, async () => {
+        const favoriteQuery = await this.firestore
+          .collection('userFavorites', ref => 
+            ref.where('userId', '==', this.currentUserId)
+              .where('scheduleId', '==', schedule.id)
+          )
+          .get()
+          .toPromise();
+
+        if (!schedule.isFavorite) {
+          await runInInjectionContext(this.injector, async () => {
+            await this.firestore.collection('userFavorites').add({
+              userId: this.currentUserId,
+              scheduleId: schedule.id,
+              addedAt: new Date()
+            });
+          });
+        } else {
+          await runInInjectionContext(this.injector, async () => {
+            const docToDelete = favoriteQuery?.docs[0];
+            if (docToDelete) {
+              await docToDelete.ref.delete();
+            }
+          });
+        }
+
+        schedule.isFavorite = !schedule.isFavorite;
+        
+        // Update the schedules array with the modified schedule
+        const index = this.schedules.findIndex(s => s.id === schedule.id);
+        if (index !== -1) {
+          this.schedules[index] = { ...schedule };
+        }
+
+        this.sortSchedules();
+        this.findUpcomingSchedule();
+        this.filterSchedules();
+        
+        this.presentToast(schedule.isFavorite ? 
+          `${schedule.location} added to favorites` : 
+          `${schedule.location} removed from favorites`
+        );
+      });
+    } catch (error) {
+      console.error('Error updating favorite status:', error);
+      this.presentToast('Error updating favorite status');
+    }
   }
 }

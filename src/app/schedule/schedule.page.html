@@ -27,8 +27,8 @@
     </ion-segment-button>
   </ion-segment>
   
-  <div class="upcoming-section" *ngIf="upcomingSchedule">
-    <h4 class="section-title">Next Collection</h4>
+  <div class="upcoming-section" *ngIf="upcomingSchedule && isLoggedIn">
+    <h4 class="section-title">Next Favorite Collection</h4>
     <ion-card class="featured-card">
       <ion-card-header>
         <div class="card-header-content">
@@ -72,6 +72,8 @@
       </ion-card-content>
     </ion-card>
   </div>
+
+  <h4 class="section-title" *ngIf="!isLoggedIn">Log in to see your favorite collections</h4>
   
   <h4 class="section-title">All Collections</h4>
   <ion-list>
@@ -81,7 +83,15 @@
           <ion-icon [name]="getIcon(schedule.wasteType)" class="avatar-icon"></ion-icon>
         </ion-avatar>
         <ion-label>
-          <h2>{{ schedule.location }}</h2>
+          <div class="location-header">
+            <h2>{{ schedule.location }}</h2>
+            <ion-icon 
+              [name]="schedule.isFavorite ? 'star' : 'star-outline'"
+              [color]="schedule.isFavorite ? 'warning' : 'medium'"
+              (click)="toggleFavorite(schedule); $event.stopPropagation()"
+              class="favorite-icon">
+            </ion-icon>
+          </div>
           <p class="schedule-date">
             <ion-icon name="calendar-outline"></ion-icon>
             {{ schedule.date | date: 'EEE, MMM d' }} • {{ schedule.time }}
@@ -126,3 +136,17 @@
     </ion-fab-button>
   </ion-fab>
 </ion-content>
+
+<style>
+  .location-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .favorite-icon {
+    font-size: 1.2rem;
+    padding: 8px;
+    cursor: pointer;
+  }
+</style>

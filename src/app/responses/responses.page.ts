@@ -3,6 +3,7 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { ToastController, ModalController, LoadingController } from '@ionic/angular';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
+import { Router } from '@angular/router';
 
 interface Report {
   id: string;
@@ -44,17 +45,36 @@ export class ResponsesPage implements OnInit {
     private firestore: AngularFirestore,
     private ngZone: NgZone,
     private injector: Injector,
-    private auth: AngularFireAuth 
+    private auth: AngularFireAuth,
+    private router: Router
   ) { }
 
   async ngOnInit() {
-    await runInInjectionContext(this.injector, async () => {
-      await this.loadUserFeedback();
-    });
+    await this.checkAuth();
   }
 
   segmentChanged(event: any) {
     this.selectedSegment = event.detail.value;
+  }
+
+  private async checkAuth() {
+    try {
+      const user = await this.auth.currentUser;
+      if (!user) {
+        this.router.navigate(['/auth']);
+        const toast = await this.toastController.create({
+          message: 'Please login to view your responses',
+          duration: 3000,
+          color: 'warning'
+        });
+        toast.present();
+        return;
+      }
+      await this.loadUserFeedback();
+    } catch (error) {
+      console.error('Auth error:', error);
+      this.router.navigate(['/login']);
+    }
   }
 
   private async loadUserFeedback() {

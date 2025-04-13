@@ -170,6 +170,6 @@ export class AuthPage implements OnInit {
   }
 
   forgotPassword() {
-    // Navigate to forgot password page or implement logic here
+    this.router.navigate(['/forgot-password']); // Replace with the actual route of your Forgot Password page
   }
 }

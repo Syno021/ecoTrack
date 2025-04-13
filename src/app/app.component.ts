@@ -92,6 +92,7 @@ export class AppComponent {
       '/home',
       '/auth',
       '/admin',
+      '/forgot-password',
     ];
     
     // Check if URL starts with any of these prefixes

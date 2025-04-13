@@ -73,8 +73,23 @@ export class AuthPage implements OnInit {
 
     try {
       const { email, password } = this.loginForm.value;
-      await this.fireAuth.signInWithEmailAndPassword(email, password);
-      this.router.navigate(['/manage-dump']);
+      const userCredential = await this.fireAuth.signInWithEmailAndPassword(email, password);
+      
+      if (userCredential.user) {
+        // Check user role in Firestore
+        await this.ngZone.run(() => {
+          return runInInjectionContext(this.injector, async () => {
+            const userDoc = await this.firestore.collection('users').doc(userCredential.user?.uid).get().toPromise();
+            const userData = userDoc?.data() as { role?: string };
+            
+            if (userData?.role === 'admin') {
+              this.router.navigate(['/admin']); // Redirect to admin page
+            } else {
+              this.router.navigate(['/manage-dump']); // Redirect to regular user page
+            }
+          });
+        });
+      }
     } catch (error: any) {
       console.error('Login error:', error);
       this.showAlert('Login Failed', error?.message || 'An unknown error occurred');

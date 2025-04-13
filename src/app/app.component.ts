@@ -1,3 +1,4 @@
+// app.component.ts
 import { Component } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { Platform, MenuController } from '@ionic/angular';
@@ -43,6 +44,9 @@ export class AppComponent {
   
   // Flag to check if navbar should be hidden
   hideNavbar: boolean = false;
+  
+  // Current URL to expose to template
+  currentUrl: string = '';
 
   constructor(
     private platform: Platform,
@@ -52,6 +56,8 @@ export class AppComponent {
   ) {
     this.initializeApp();
     this.monitorRouteChanges();
+    // Initialize current URL
+    this.currentUrl = this.router.url;
   }
 
   initializeApp() {
@@ -62,7 +68,7 @@ export class AppComponent {
     if (this.isWeb) {
       // Optional: open the menu programmatically on initial load for larger screens
       this.platform.ready().then(() => {
-        if (window.innerWidth > 768 && !this.hideNavbar) {
+        if (window.innerWidth > 768 && !this.isOnRestrictedPage(this.currentUrl)) {
           this.menuCtrl.open('sidebar');
         }
       });
@@ -75,13 +81,17 @@ export class AppComponent {
       filter(event => event instanceof NavigationEnd)
     ).subscribe((event: NavigationEnd) => {
       const url = event.url;
+      this.currentUrl = url; // Update the public current URL
       
       // Check if the current URL is one where navbar should be hidden
       this.hideNavbar = this.shouldHideNavbar(url);
       
       // Close sidebar when on restricted pages
-      if (this.hideNavbar) {
+      if (this.isOnRestrictedPage(url)) {
         this.menuCtrl.close('sidebar');
+        this.menuCtrl.enable(false, 'sidebar');
+      } else {
+        this.menuCtrl.enable(true, 'sidebar');
       }
     });
   }
@@ -90,6 +100,21 @@ export class AppComponent {
     // List of paths where navbar should be hidden
     const restrictedPaths = [
       '/',
+      '/auth',
+      '/admin',
+      '/forgot-password',
+    ];
+    
+    // Check if URL starts with any of these prefixes
+    return restrictedPaths.some(path => 
+      url === path || 
+      (path !== '/' && url.startsWith(path + '/'))
+    );
+  }
+
+  isOnRestrictedPage(url: string): boolean {
+    // List of paths where sidebar should be disabled
+    const restrictedPaths = [
       '/home',
       '/auth',
       '/admin',
@@ -103,11 +128,17 @@ export class AppComponent {
     );
   }
 
+  // Helper method to determine if menu button should be shown
+  showMenuButton(): boolean {
+    // Show menu button only on mobile view and when not on restricted pages
+    return !this.isWeb && !this.isOnRestrictedPage(this.currentUrl);
+  }
+
   navigateTo(url: string) {
     this.router.navigateByUrl(url);
     
-    // Close the menu on navigation for mobile web or when going to restricted pages
-    if ((this.isWeb && window.innerWidth <= 768) || this.shouldHideNavbar(url)) {
+    // Close the menu on navigation for mobile or when going to restricted pages
+    if (!this.isWeb || this.isOnRestrictedPage(url)) {
       this.menuCtrl.close('sidebar');
     }
   }

@@ -1,8 +1,9 @@
+<!-- app.component.html -->
 <ion-app>
   <!-- Use ion-split-pane as the main container for both web and mobile -->
-  <ion-split-pane contentId="main-content" [when]="isWeb && !hideNavbar && 'sm'">
+  <ion-split-pane contentId="main-content" [when]="isWeb && !isOnRestrictedPage(currentUrl) && 'sm'">
     <!-- Sidebar navigation (will auto-hide on mobile and restricted pages) -->
-    <ion-menu side="start" menuId="sidebar" contentId="main-content">
+    <ion-menu side="start" menuId="sidebar" contentId="main-content" [disabled]="isOnRestrictedPage(currentUrl)">
       <ion-header>
         <ion-toolbar color="primary">
           <ion-title>Navigation</ion-title>
@@ -20,11 +21,12 @@
     
     <!-- Main content area - used for both web and mobile -->
     <div class="ion-page" id="main-content">
-      <!-- Global header for mobile -->
+      <!-- Global header -->
       <ion-header>
         <ion-toolbar color="primary">
-          <ion-buttons slot="start">
-            <ion-menu-button></ion-menu-button>
+          <!-- Only show menu button on mobile view and when not on restricted pages -->
+          <ion-buttons slot="start" *ngIf="!isWeb">
+            <ion-menu-button *ngIf="!isOnRestrictedPage(currentUrl)"></ion-menu-button>
           </ion-buttons>
           <ion-title>EcoTrack</ion-title>
         </ion-toolbar>

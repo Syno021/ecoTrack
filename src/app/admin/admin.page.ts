@@ -76,7 +76,11 @@ export class AdminPage implements OnInit {
 
   private async checkAdminStatus(userId: string): Promise<boolean> {
     try {
-      const userDoc = await this.firestore.collection('users').doc(userId).get().toPromise();
+      const userDoc = await this.ngZone.run(() => {
+        return runInInjectionContext(this.injector, async () => {
+          return await this.firestore.collection('users').doc(userId).get().toPromise();
+        });
+      });
       interface UserData {
         role?: string;
       }

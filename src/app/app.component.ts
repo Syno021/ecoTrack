@@ -47,7 +47,8 @@ export class AppComponent {
   constructor(
     private platform: Platform,
     private router: Router,
-    private menuCtrl: MenuController
+    private menuCtrl: MenuController,
+    private menuController: MenuController
   ) {
     this.initializeApp();
     this.monitorRouteChanges();
@@ -109,5 +110,9 @@ export class AppComponent {
     if ((this.isWeb && window.innerWidth <= 768) || this.shouldHideNavbar(url)) {
       this.menuCtrl.close('sidebar');
     }
+  }
+
+  async toggleMenu() {
+    await this.menuController.toggle('sidebar');
   }
 }

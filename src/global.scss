@@ -39,9 +39,38 @@
 /* Custom color preservation for dark mode */
 :root {
   --preserve-color: inherit;
+  
+  &.ios, &.md {
+    --ion-color-dark: #f4f4f4;
+    --ion-color-dark-rgb: 244,244,244;
+    --ion-color-dark-contrast: #000000;
+    --ion-color-dark-shade: #d7d7d7;
+    --ion-text-color: #000000;
+    --ion-background-color: #ffffff;
+  }
 }
 
 @media (prefers-color-scheme: dark) {
+  :root {
+    --ion-color-dark: #ffffff;
+    --ion-color-dark-rgb: 255,255,255;
+    --ion-color-dark-contrast: #000000;
+    --ion-color-dark-shade: #e0e0e0;
+    --ion-text-color: #ffffff;
+    --ion-background-color: #121212;
+  }
+
+  /* Global dark mode styles */
+  body {
+    color: var(--ion-text-color);
+    background-color: var(--ion-background-color);
+  }
+
+  ion-content {
+    --ion-text-color: var(--ion-text-color);
+    --ion-background-color: var(--ion-background-color);
+  }
+
   .preserve-color {
     color: var(--preserve-color) !important;
     background-color: var(--preserve-color) !important;
@@ -53,5 +82,10 @@
   
   .preserve-bg-color {
     background-color: var(--preserve-color) !important;
+  }
+
+  /* Ensure text readability in dark mode */
+  h1, h2, h3, h4, h5, h6, p, span, ion-label {
+    color: var(--ion-text-color);
   }
 }

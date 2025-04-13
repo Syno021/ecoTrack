@@ -2,7 +2,7 @@
   <!-- Use ion-split-pane as the main container for both web and mobile -->
   <ion-split-pane contentId="main-content" [when]="isWeb && !hideNavbar && 'sm'">
     <!-- Sidebar navigation (will auto-hide on mobile and restricted pages) -->
-    <ion-menu contentId="main-content" menuId="sidebar" type="overlay" [disabled]="hideNavbar">
+    <ion-menu side="start" menuId="sidebar" contentId="main-content">
       <ion-header>
         <ion-toolbar color="primary">
           <ion-title>Navigation</ion-title>
@@ -20,6 +20,16 @@
     
     <!-- Main content area - used for both web and mobile -->
     <div class="ion-page" id="main-content">
+      <!-- Global header for mobile -->
+      <ion-header>
+        <ion-toolbar color="primary">
+          <ion-buttons slot="start">
+            <ion-menu-button></ion-menu-button>
+          </ion-buttons>
+          <ion-title>EcoTrack</ion-title>
+        </ion-toolbar>
+      </ion-header>
+
       <ion-content>
         <ion-router-outlet></ion-router-outlet>
       </ion-content>

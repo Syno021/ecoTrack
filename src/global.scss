@@ -35,3 +35,23 @@
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import "@ionic/angular/css/palettes/dark.system.css";
+
+/* Custom color preservation for dark mode */
+:root {
+  --preserve-color: inherit;
+}
+
+@media (prefers-color-scheme: dark) {
+  .preserve-color {
+    color: var(--preserve-color) !important;
+    background-color: var(--preserve-color) !important;
+  }
+  
+  .preserve-text-color {
+    color: var(--preserve-color) !important;
+  }
+  
+  .preserve-bg-color {
+    background-color: var(--preserve-color) !important;
+  }
+}

@@ -78,10 +78,10 @@ export class AdminPage implements OnInit {
     try {
       const userDoc = await this.firestore.collection('users').doc(userId).get().toPromise();
       interface UserData {
-        status?: string;
+        role?: string;
       }
       const userData = userDoc?.data() as UserData;
-      return userData?.status === 'admin';
+      return userData?.role === 'admin';
     } catch (error) {
       console.error('Error checking admin status:', error);
       return false;

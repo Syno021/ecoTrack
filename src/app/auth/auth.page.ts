@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { AlertController, LoadingController } from '@ionic/angular';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
+import { GoogleAuthProvider, FacebookAuthProvider, OAuthProvider, signInWithPopup, getAuth } from 'firebase/auth';
 
 @Component({
   selector: 'app-auth',
@@ -157,16 +158,83 @@ export class AuthPage implements OnInit {
   }
 
   // Social login methods (placeholders)
-  async loginWithFacebook() {
-    // Implement Facebook login logic
-  }
-
   async loginWithGoogle() {
-    // Implement Google login logic
+    const provider = new GoogleAuthProvider();
+    await this.socialSignIn(provider);
   }
-
+  
+  // Facebook Login
+  async loginWithFacebook() {
+    const provider = new FacebookAuthProvider();
+    await this.socialSignIn(provider);
+  }
+  
+  // LinkedIn Login (Custom via Microsoft OAuth)
   async loginWithLinkedIn() {
-    // Implement LinkedIn login logic
+    const provider = new OAuthProvider('microsoft.com'); // Works for LinkedIn/Microsoft OAuth
+    await this.socialSignIn(provider);
+  }
+  
+  // Shared function
+  async socialSignIn(provider: any) {
+    const auth = getAuth();
+    const loading = await this.loadingController.create({
+      message: 'Signing in...',
+      spinner: 'crescent'
+    });
+    await loading.present();
+  
+    try {
+      // Run the sign-in process in NgZone context
+      const result = await this.ngZone.run(() => {
+        return runInInjectionContext(this.injector, async () => {
+          return signInWithPopup(auth, provider);
+        });
+      });
+      
+      const user = result.user;
+  
+      // Store user in Firestore if new - wrapped in NgZone and injection context
+      await this.ngZone.run(() => {
+        return runInInjectionContext(this.injector, async () => {
+          const userRef = this.firestore.collection('users').doc(user.uid);
+          const userSnapshot = await userRef.get().toPromise();
+  
+          if (!userSnapshot?.exists) {
+            await userRef.set({
+              email: user.email,
+              fullName: user.displayName,
+              createdAt: new Date(),
+              role: 'user',
+              userId: user.uid
+            });
+          }
+        });
+      });
+  
+      // Navigation wrapped in NgZone
+      await this.ngZone.run(() => {
+        return runInInjectionContext(this.injector, async () => {
+          this.router.navigate(['/manage-dump']);
+        });
+      });
+      
+    } catch (error: any) {
+      console.error(error);
+      // Alert is UI-related, so also wrap in NgZone
+      await this.ngZone.run(() => {
+        return runInInjectionContext(this.injector, async () => {
+          this.showAlert('Login Failed', error?.message || 'Could not sign in');
+        });
+      });
+    } finally {
+      // Dismiss loading controller inside NgZone
+      await this.ngZone.run(() => {
+        return runInInjectionContext(this.injector, async () => {
+          loading.dismiss();
+        });
+      });
+    }
   }
 
   forgotPassword() {

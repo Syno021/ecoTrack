@@ -1,10 +1,8 @@
-
-
 <ion-content [fullscreen]="true" class="ion-padding">
   <ion-card>
     <ion-card-header>
-      <ion-card-title>Waste Recognition</ion-card-title>
-      <ion-card-subtitle>Upload an image to identify waste type</ion-card-subtitle>
+      <ion-card-title class="ion-text-center">Waste Recognition</ion-card-title>
+      <ion-card-subtitle class="ion-text-center">Upload an image to identify waste type</ion-card-subtitle>
     </ion-card-header>
     
     <ion-card-content>
@@ -21,19 +19,26 @@
         </ng-template>
       </div>
 
-      <ion-button expand="block" color="primary" (click)="takePhoto()">
-        <ion-icon slot="start" name="camera"></ion-icon>
-        Take Photo
-      </ion-button>
-
-      <ion-button expand="block" color="secondary" (click)="fileInput.click()">
-        <ion-icon slot="start" name="image"></ion-icon>
-        Upload from Gallery
-      </ion-button>
+      <ion-grid>
+        <ion-row>
+          <ion-col size="6">
+            <ion-button expand="block" color="primary" (click)="takePhoto()">
+              <ion-icon slot="start" name="camera"></ion-icon>
+              Take Photo
+            </ion-button>
+          </ion-col>
+          <ion-col size="6">
+            <ion-button expand="block" color="secondary" (click)="fileInput.click()">
+              <ion-icon slot="start" name="image"></ion-icon>
+              Gallery
+            </ion-button>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
       
       <ion-button 
         expand="block" 
-        color="secondary" 
+        color="tertiary" 
         class="action-button"
         (click)="recognizeWaste()" 
         [disabled]="!imagePreview">
@@ -43,8 +48,19 @@
       
       <div *ngIf="detectedWaste" class="result-card" [ngStyle]="{'background-color': 'rgba(var(--ion-color-' + getWasteColor(detectedWaste) + '-rgb), 0.1)'}">
         <ion-icon [name]="getWasteIcon(detectedWaste)" [color]="getWasteColor(detectedWaste)" class="result-icon"></ion-icon>
-        <p class="waste-type">{{ detectedWaste }}</p>
-        <p>{{ wasteDescription }}</p>
+        <div class="result-content">
+          <h3 class="waste-type">{{ detectedWaste }}</h3>
+          
+          <div *ngIf="confidenceScore" class="confidence-indicator">
+            <ion-progress-bar 
+              [value]="confidenceScore/100" 
+              [color]="getWasteColor(detectedWaste)">
+            </ion-progress-bar>
+            <p class="confidence-text">Confidence: {{ confidenceScore }}%</p>
+          </div>
+          
+          <p class="waste-description">{{ wasteDescription }}</p>
+        </div>
         
         <ion-button 
           fill="outline" 

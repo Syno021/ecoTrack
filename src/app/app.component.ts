@@ -103,6 +103,7 @@ export class AppComponent {
       '/auth',
       '/admin',
       '/forgot-password',
+      '/home' // Added /home to hide navbar on home page
     ];
     
     // Check if URL starts with any of these prefixes
@@ -115,10 +116,10 @@ export class AppComponent {
   isOnRestrictedPage(url: string): boolean {
     // List of paths where sidebar should be disabled
     const restrictedPaths = [
-      '/home',
       '/auth',
       '/admin',
       '/forgot-password',
+      '/home' // Ensure /home is consistently handled as a restricted page
     ];
     
     // Check if URL starts with any of these prefixes

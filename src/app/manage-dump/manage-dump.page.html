@@ -1,5 +1,3 @@
-
-
 <ion-content [fullscreen]="true" class="ion-padding">
   <ion-header collapse="condense">
     <ion-toolbar>
@@ -35,9 +33,40 @@
             <ion-input type="tel" [(ngModel)]="pickupRequest.phone" name="phone" required></ion-input>
           </ion-item>
           
+          <!-- Address Section with Map Integration -->
           <ion-item>
-            <ion-label position="floating">Address</ion-label>
-            <ion-textarea rows="3" [(ngModel)]="pickupRequest.address" name="address" required></ion-textarea>
+            <ion-label>Address</ion-label>
+            <ion-button slot="end" fill="clear" (click)="toggleAddressMap('request')">
+              <ion-icon [name]="showRequestAddressMap ? 'chevron-up-outline' : 'chevron-down-outline'"></ion-icon>
+            </ion-button>
+          </ion-item>
+          
+          <div *ngIf="showRequestAddressMap">
+            <div id="requestAddressMap" style="height: 200px; width: 100%; margin-bottom: 10px;"></div>
+            <ion-button expand="block" fill="outline" color="secondary" (click)="getCurrentLocation('request')">
+              <ion-icon name="locate-outline" slot="start"></ion-icon>
+              Use My Current Location
+            </ion-button>
+          </div>
+          
+          <ion-item>
+            <ion-label position="floating">Address Line</ion-label>
+            <ion-input type="text" [(ngModel)]="pickupRequest.address" name="address" required></ion-input>
+          </ion-item>
+          
+          <ion-item>
+            <ion-label position="floating">City</ion-label>
+            <ion-input type="text" [(ngModel)]="pickupRequest.city" name="city" required></ion-input>
+          </ion-item>
+          
+          <ion-item>
+            <ion-label position="floating">State/Province</ion-label>
+            <ion-input type="text" [(ngModel)]="pickupRequest.state" name="state" required></ion-input>
+          </ion-item>
+          
+          <ion-item>
+            <ion-label position="floating">Postal Code</ion-label>
+            <ion-input type="text" [(ngModel)]="pickupRequest.postalCode" name="postalCode" required></ion-input>
           </ion-item>
           
           <ion-item>
@@ -48,14 +77,14 @@
           <ion-item>
             <ion-label>Waste Type</ion-label>
             <ion-select [(ngModel)]="pickupRequest.wasteType" name="wasteType" required>
-              <ion-select-option value="household">Recycling</ion-select-option>
+              <ion-select-option value="Recycling">Recycling</ion-select-option>
               <ion-select-option value="garden">Garden Waste</ion-select-option>
               <ion-select-option value="construction">Construction Debris</ion-select-option>
               <ion-select-option value="hazardous">Hazardous Materials</ion-select-option>
               <ion-select-option value="household">Household Waste</ion-select-option>
-              <ion-select-option value="garden">Solid Waste</ion-select-option>
-              <ion-select-option value="construction">Liquid Waste</ion-select-option>
-              <ion-select-option value="hazardous">Chemical Waste</ion-select-option>
+              <ion-select-option value="Solid">Solid Waste</ion-select-option>
+              <ion-select-option value="Liquid">Liquid Waste</ion-select-option>
+              <ion-select-option value="Chemical">Chemical Waste</ion-select-option>
               <ion-select-option value="other">Other</ion-select-option>
             </ion-select>
           </ion-item>
@@ -117,9 +146,40 @@
             </ion-select>
           </ion-item>
           
+          <!-- Issue Location with Map Integration -->
           <ion-item>
-            <ion-label position="floating">Issue Location</ion-label>
-            <ion-textarea rows="3" [(ngModel)]="issueReport.location" name="location" required></ion-textarea>
+            <ion-label>Issue Location</ion-label>
+            <ion-button slot="end" fill="clear" (click)="toggleAddressMap('report')">
+              <ion-icon [name]="showReportAddressMap ? 'chevron-up-outline' : 'chevron-down-outline'"></ion-icon>
+            </ion-button>
+          </ion-item>
+          
+          <div *ngIf="showReportAddressMap">
+            <div id="reportAddressMap" style="height: 200px; width: 100%; margin-bottom: 10px;"></div>
+            <ion-button expand="block" fill="outline" color="secondary" (click)="getCurrentLocation('report')">
+              <ion-icon name="locate-outline" slot="start"></ion-icon>
+              Use My Current Location
+            </ion-button>
+          </div>
+          
+          <ion-item>
+            <ion-label position="floating">Address Line</ion-label>
+            <ion-input type="text" [(ngModel)]="issueReport.location" name="location" required></ion-input>
+          </ion-item>
+          
+          <ion-item>
+            <ion-label position="floating">City</ion-label>
+            <ion-input type="text" [(ngModel)]="issueReport.city" name="city" required></ion-input>
+          </ion-item>
+          
+          <ion-item>
+            <ion-label position="floating">State/Province</ion-label>
+            <ion-input type="text" [(ngModel)]="issueReport.state" name="state" required></ion-input>
+          </ion-item>
+          
+          <ion-item>
+            <ion-label position="floating">Postal Code</ion-label>
+            <ion-input type="text" [(ngModel)]="issueReport.postalCode" name="postalCode" required></ion-input>
           </ion-item>
           
           <ion-item>

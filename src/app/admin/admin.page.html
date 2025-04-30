@@ -1,5 +1,3 @@
-
-
 <ion-content class="ion-padding">
   <!-- Main Navigation -->
   <ion-segment [(ngModel)]="selectedMainSection" color="primary">
@@ -26,7 +24,7 @@
       <ion-segment-button value="resolved-reports">
         <ion-label>Resolved</ion-label>
       </ion-segment-button>
-      </ion-segment>
+    </ion-segment>
 
     <!-- Pending Requests -->
     <div *ngIf="selectedSegment === 'pending-requests'">
@@ -149,9 +147,106 @@
             <ion-input [(ngModel)]="newLocation.location" name="location" required></ion-input>
           </ion-item>
 
+          <!-- Toggle between manual and search-based address entry -->
           <ion-item>
-            <ion-label position="stacked">Address</ion-label>
-            <ion-input [(ngModel)]="newLocation.address" name="address" required></ion-input>
+            <ion-label>Manual Address Entry</ion-label>
+            <ion-toggle [(ngModel)]="manualAddressEntry" name="manualAddressEntry" (ionChange)="toggleAddressEntryMode()"></ion-toggle>
+          </ion-item>
+
+          <!-- Search-based address entry (visible when manualAddressEntry is false) -->
+          <div *ngIf="!manualAddressEntry">
+            <!-- OSM Map Search & Selection -->
+            <ion-item>
+              <ion-label position="stacked">Search Location</ion-label>
+              <ion-input [(ngModel)]="mapSearchQuery" name="mapSearch" 
+                        (ionChange)="searchLocation()" placeholder="Search for address..."></ion-input>
+            </ion-item>
+
+            <!-- Search Results -->
+            <ion-list *ngIf="searchResults.length > 0">
+              <ion-item *ngFor="let result of searchResults" (click)="selectLocation(result)">
+                <ion-label>{{result.display_name}}</ion-label>
+              </ion-item>
+            </ion-list>
+          </div>
+
+          <!-- Manual address entry (visible when manualAddressEntry is true) -->
+          <div *ngIf="manualAddressEntry">
+            <ion-item>
+              <ion-label position="stacked">Street</ion-label>
+              <ion-input [(ngModel)]="addressDetails.street" name="street" (ionChange)="updateFullAddress()"></ion-input>
+            </ion-item>
+            
+            <ion-item>
+              <ion-label position="stacked">City</ion-label>
+              <ion-input [(ngModel)]="addressDetails.city" name="city" (ionChange)="updateFullAddress()"></ion-input>
+            </ion-item>
+            
+            <ion-item>
+              <ion-label position="stacked">State</ion-label>
+              <ion-input [(ngModel)]="addressDetails.state" name="state" (ionChange)="updateFullAddress()"></ion-input>
+            </ion-item>
+            
+            <ion-item>
+              <ion-label position="stacked">Postal Code</ion-label>
+              <ion-input [(ngModel)]="addressDetails.postalCode" name="postalCode" (ionChange)="updateFullAddress()"></ion-input>
+            </ion-item>
+            
+            <ion-item>
+              <ion-label position="stacked">Country</ion-label>
+              <ion-input [(ngModel)]="addressDetails.country" name="country" (ionChange)="updateFullAddress()"></ion-input>
+            </ion-item>
+          </div>
+
+          <!-- Collapsible Map Section -->
+          <ion-item>
+            <ion-label (click)="toggleMapVisibility()">
+              <ion-icon [name]="isMapVisible ? 'chevron-down' : 'chevron-forward'"></ion-icon>
+              Map Selection
+            </ion-label>
+          </ion-item>
+          
+          <div *ngIf="isMapVisible" class="map-container">
+            <!-- Map -->
+            <div id="map" style="height: 300px; width: 100%; margin: 10px 0;"></div>
+            
+            <!-- Selected Address Details (only shown when not in manual entry mode) -->
+            <ion-list *ngIf="selectedAddress && !manualAddressEntry">
+              <ion-item-divider>
+                <ion-label>Selected Address Details</ion-label>
+              </ion-item-divider>
+              
+              <ion-item>
+                <ion-label position="stacked">Street</ion-label>
+                <ion-input [(ngModel)]="addressDetails.street" name="street-readonly" readonly></ion-input>
+              </ion-item>
+              
+              <ion-item>
+                <ion-label position="stacked">City</ion-label>
+                <ion-input [(ngModel)]="addressDetails.city" name="city-readonly" readonly></ion-input>
+              </ion-item>
+              
+              <ion-item>
+                <ion-label position="stacked">State</ion-label>
+                <ion-input [(ngModel)]="addressDetails.state" name="state-readonly" readonly></ion-input>
+              </ion-item>
+              
+              <ion-item>
+                <ion-label position="stacked">Postal Code</ion-label>
+                <ion-input [(ngModel)]="addressDetails.postalCode" name="postalCode-readonly" readonly></ion-input>
+              </ion-item>
+              
+              <ion-item>
+                <ion-label position="stacked">Country</ion-label>
+                <ion-input [(ngModel)]="addressDetails.country" name="country-readonly" readonly></ion-input>
+              </ion-item>
+            </ion-list>
+          </div>
+
+          <!-- Full address display (read-only in search mode, auto-generated in manual mode) -->
+          <ion-item>
+            <ion-label position="stacked">Full Address</ion-label>
+            <ion-input [(ngModel)]="newLocation.address" name="address" [readonly]="!manualAddressEntry" required></ion-input>
           </ion-item>
 
           <!-- Replace ion-datetime with ion-select for weekdays -->

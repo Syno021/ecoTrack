@@ -22,10 +22,10 @@
     <!-- Main content area - used for both web and mobile -->
     <div class="ion-page" id="main-content">
       <!-- Global header -->
-      <ion-header>
+      <ion-header *ngIf="!hideNavbar">
         <ion-toolbar color="primary">
           <!-- Only show menu button on mobile view and when not on restricted pages -->
-          <ion-buttons slot="start" >
+          <ion-buttons slot="start">
             <ion-menu-button *ngIf="!isOnRestrictedPage(currentUrl)"></ion-menu-button>
           </ion-buttons>
           <ion-title>EcoTrack</ion-title>

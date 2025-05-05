@@ -85,7 +85,28 @@ export class AdminPage implements OnInit, OnDestroy, AfterViewInit {
     }
   };
   pickupLocations: PickupLocation[] = [];
-  wasteTypes = ['recyclable', 'organic', 'hazardous'];
+  wasteTypes = [
+    'recyclable',
+    'organic', 
+    'hazardous',
+    'general waste',
+    'electronic waste',
+    'construction debris',
+    'medical waste',
+    'green waste',
+    'glass',
+    'plastic',
+    'paper',
+    'metal',
+    'textile waste',
+    'bulky waste',
+    'liquid waste',
+    'food waste',
+    'radioactive waste',
+    'chemical waste',
+    'biodegradable',
+    'non-biodegradable'
+  ];
   weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
   
   constructor(

@@ -137,6 +137,7 @@ export class AppComponent {
 
   navigateTo(url: string) {
     this.router.navigateByUrl(url);
+    this.menuCtrl.close('sidebar');
     
     // Close the menu on navigation for mobile or when going to restricted pages
     if (!this.isWeb || this.isOnRestrictedPage(url)) {

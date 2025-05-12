@@ -3,6 +3,11 @@
     <ion-toolbar>
       <ion-title size="large">Manage Dump</ion-title>
     </ion-toolbar>
+    <ion-buttons slot="end">
+      <ion-button (click)="logout()" title="Logout">
+        <ion-icon name="log-out-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-header>
 
   <ion-segment [(ngModel)]="selectedSegment" color="primary" class="ion-margin-bottom">

@@ -1,7 +1,7 @@
-<!-- app.component.html -->
 <ion-app>
   <!-- Use ion-split-pane as the main container for both web and mobile -->
   <ion-split-pane contentId="main-content" [when]="isWeb && !isOnRestrictedPage(currentUrl) && 'sm'">
+    
     <!-- Sidebar navigation (will auto-hide on mobile and restricted pages) -->
     <ion-menu side="start" menuId="sidebar" contentId="main-content" [disabled]="isOnRestrictedPage(currentUrl)">
       <ion-header>
@@ -9,6 +9,7 @@
           <ion-title>Navigation</ion-title>
         </ion-toolbar>
       </ion-header>
+      
       <ion-content>
         <ion-list>
           <ion-item *ngFor="let item of navItems" (click)="navigateTo(item.url)" detail="false">
@@ -17,6 +18,16 @@
           </ion-item>
         </ion-list>
       </ion-content>
+      
+      <!-- Logout button at the bottom of sidebar -->
+      <ion-footer>
+        <ion-toolbar>
+          <ion-item button (click)="logout()" detail="false">
+            <ion-icon slot="start" name="log-out-outline"></ion-icon>
+            <ion-label>Logout</ion-label>
+          </ion-item>
+        </ion-toolbar>
+      </ion-footer>
     </ion-menu>
     
     <!-- Main content area - used for both web and mobile -->
@@ -31,7 +42,7 @@
           <ion-title>EcoTrack</ion-title>
         </ion-toolbar>
       </ion-header>
-
+      
       <ion-content>
         <ion-router-outlet></ion-router-outlet>
       </ion-content>
@@ -42,7 +53,14 @@
           <ion-icon [name]="item.icon"></ion-icon>
           <ion-label>{{ item.title }}</ion-label>
         </ion-tab-button>
+        
+        <!-- Logout tab button for mobile view -->
+        <ion-tab-button (click)="logout()">
+          <ion-icon name="log-out-outline"></ion-icon>
+          <ion-label>Logout</ion-label>
+        </ion-tab-button>
       </ion-tab-bar>
     </div>
   </ion-split-pane>
 </ion-app>
+

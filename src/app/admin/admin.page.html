@@ -1,4 +1,10 @@
 <ion-content class="ion-padding">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Admin</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
   <!-- Main Navigation -->
   <ion-segment [(ngModel)]="selectedMainSection" color="primary">
     <ion-segment-button value="requests-reports">
@@ -304,4 +310,25 @@
       </ion-item>
     </ion-list>
   </div>
+
+  <!-- Removed logout button from here -->
 </ion-content>
+
+<!-- Fixed position logout button -->
+<ion-button 
+  (click)="logout()" 
+  title="Logout"
+  class="fixed-logout-button">
+  <ion-icon name="log-out-outline"></ion-icon>
+</ion-button>
+
+<style>
+  .fixed-logout-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+    color: red;
+    background-color: white;
+  }
+</style>

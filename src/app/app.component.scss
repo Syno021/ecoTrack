@@ -1,4 +1,5 @@
-.app-container {
+
+  .app-container {
     display: flex;
     width: 100%;
     height: 100%;
@@ -13,7 +14,7 @@
     display: flex;
     flex-direction: column;
   }
-
+  
   ion-split-pane {
     --side-width: 150px;
     --side-max-width: 25%;

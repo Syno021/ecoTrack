@@ -1,8 +1,10 @@
 // app.component.ts
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { Platform, MenuController } from '@ionic/angular';
 import { filter } from 'rxjs/operators';
+import { AngularFireAuth } from '@angular/fire/compat/auth';
+import { ToastController} from '@ionic/angular';
 
 @Component({
   selector: 'app-root',
@@ -10,10 +12,10 @@ import { filter } from 'rxjs/operators';
   styleUrls: ['app.component.scss'],
   standalone: false
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   public navItems = [
     {
-      title: 'home',
+      title: 'Home',
       url: '/home',
       icon: 'home'
     },
@@ -43,7 +45,7 @@ export class AppComponent {
   isWeb: boolean = false;
   
   // Flag to check if navbar should be hidden
-  hideNavbar: boolean = false;
+  hideNavbar: boolean = true; // Default to true to prevent flash of nav on startup
   
   // Current URL to expose to template
   currentUrl: string = '';
@@ -52,27 +54,36 @@ export class AppComponent {
     private platform: Platform,
     private router: Router,
     private menuCtrl: MenuController,
-    private menuController: MenuController
+    private menuController: MenuController,
+    private toastController: ToastController,
+    private fireAuth: AngularFireAuth,
   ) {
     this.initializeApp();
+  }
+
+  ngOnInit() {
+    // Get initial route on component initialization
+    this.currentUrl = this.router.url || '/';
+    this.hideNavbar = this.shouldHideNavbar(this.currentUrl);
+    
+    // Setup route monitoring after initialization
     this.monitorRouteChanges();
-    // Initialize current URL
-    this.currentUrl = this.router.url;
+    
+    // Handle the sidebar state properly on initial load
+    if (this.isOnRestrictedPage(this.currentUrl)) {
+      this.menuCtrl.enable(false, 'sidebar');
+    } else {
+      this.menuCtrl.enable(true, 'sidebar');
+      // Only auto-open on web for non-restricted pages
+      if (this.isWeb && window.innerWidth > 768) {
+        this.menuCtrl.open('sidebar');
+      }
+    }
   }
 
   initializeApp() {
     // Check if the app is running on a web platform
     this.isWeb = this.platform.is('desktop') || this.platform.is('mobileweb');
-    
-    // If it's web view, we can enable the sidebar by default (unless on restricted pages)
-    if (this.isWeb) {
-      // Optional: open the menu programmatically on initial load for larger screens
-      this.platform.ready().then(() => {
-        if (window.innerWidth > 768 && !this.isOnRestrictedPage(this.currentUrl)) {
-          this.menuCtrl.open('sidebar');
-        }
-      });
-    }
   }
   
   monitorRouteChanges() {
@@ -103,36 +114,26 @@ export class AppComponent {
       '/auth',
       '/admin',
       '/forgot-password',
-      '/home' // Added /home to hide navbar on home page
+      '/home' // Keep /home in restricted paths
     ];
     
     // Check if URL starts with any of these prefixes
     return restrictedPaths.some(path => 
       url === path || 
+      url === path + '/' || // Handle trailing slash
       (path !== '/' && url.startsWith(path + '/'))
     );
   }
 
   isOnRestrictedPage(url: string): boolean {
-    // List of paths where sidebar should be disabled
-    const restrictedPaths = [
-      '/auth',
-      '/admin',
-      '/forgot-password',
-      '/home' // Ensure /home is consistently handled as a restricted page
-    ];
-    
-    // Check if URL starts with any of these prefixes
-    return restrictedPaths.some(path => 
-      url === path || 
-      (path !== '/' && url.startsWith(path + '/'))
-    );
+    // Use the same logic for restricted pages
+    return this.shouldHideNavbar(url);
   }
 
   // Helper method to determine if menu button should be shown
   showMenuButton(): boolean {
-    // Show menu button only on mobile view and when not on restricted pages
-    return !this.isWeb && !this.isOnRestrictedPage(this.currentUrl);
+    // Show menu button only when not on restricted pages
+    return !this.isOnRestrictedPage(this.currentUrl);
   }
 
   navigateTo(url: string) {
@@ -147,5 +148,24 @@ export class AppComponent {
 
   async toggleMenu() {
     await this.menuController.toggle('sidebar');
+  }
+
+  async presentToast(message: string, color: string) {
+    const toast = await this.toastController.create({
+      message: message,
+      duration: 2000,
+      color: color,
+      position: 'bottom'
+    });
+    toast.present();
+  }
+
+  async logout() {
+    try {
+      await this.fireAuth.signOut();
+      this.router.navigate(['/']);
+    } catch (error) {
+      this.presentToast('Unable to log out. Please try again.','danger');
+    }
   }
 }

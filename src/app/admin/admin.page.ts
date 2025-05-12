@@ -647,4 +647,13 @@ export class AdminPage implements OnInit, OnDestroy, AfterViewInit {
   async viewImage(photo: string) {
     // Implementation for image viewing modal
   }
+
+  async logout() {
+    try {
+      await this.fireAuth.signOut();
+      this.router.navigate(['/']);
+    } catch (error) {
+      this.presentToast('Unable to log out. Please try again.','danger');
+    }
+  }
 }

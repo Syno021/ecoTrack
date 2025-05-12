@@ -446,6 +446,15 @@ export class ManageDumpPage implements OnInit, AfterViewInit {
     this.issueReport.photos.splice(index, 1);
   }
 
+  async logout() {
+    try {
+      await this.fireAuth.signOut();
+      this.router.navigate(['/']);
+    } catch (error) {
+      this.presentToast('Unable to log out. Please try again.','danger');
+    }
+  }
+
   async presentToast(message: string, color: string) {
     const toast = await this.toastController.create({
       message: message,

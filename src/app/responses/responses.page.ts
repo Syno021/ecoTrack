@@ -4,6 +4,7 @@ import { ToastController, ModalController, LoadingController } from '@ionic/angu
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { Router } from '@angular/router';
+import firebase from 'firebase/compat/app';
 
 interface Report {
   id: string;
@@ -111,15 +112,25 @@ export class ResponsesPage implements OnInit {
           console.log('Reports snapshot:', reportsSnapshot?.docs.length, 'documents found');
           console.log('Requests snapshot:', requestsSnapshot?.docs.length, 'documents found');
 
-          this.userReports = reportsSnapshot?.docs.map(doc => ({
-            id: doc.id,
-            ...(doc.data() as Record<string, any>)
-          } as Report)) || [];
+          this.userReports = reportsSnapshot?.docs.map(doc => {
+            const data = doc.data() as Record<string, any>;
+            return {
+              id: doc.id,
+              ...data,
+              // Convert Firebase Timestamp to JavaScript Date
+              createdAt: this.convertTimestampToDate(data['createdAt'])
+            } as Report;
+          }) || [];
 
-          this.userRequests = requestsSnapshot?.docs.map(doc => ({
-            id: doc.id,
-            ...(doc.data() as Record<string, any>)
-          } as Request)) || [];
+          this.userRequests = requestsSnapshot?.docs.map(doc => {
+            const data = doc.data() as Record<string, any>;
+            return {
+              id: doc.id,
+              ...data,
+              // Convert Firebase Timestamp to JavaScript Date
+              updatedAt: this.convertTimestampToDate(data['updatedAt'])
+            } as Request;
+          }) || [];
 
           console.log('Processed Reports:', this.userReports);
           console.log('Processed Requests:', this.userRequests);
@@ -129,6 +140,7 @@ export class ResponsesPage implements OnInit {
       await loading.dismiss();
       this.isLoading = false;
     } catch (error) {
+      this.isLoading = false;
       this.error = 'Failed to load feedback. Please try again.';
       console.error('Error loading feedback:', error);
       const toast = await this.toastController.create({
@@ -138,5 +150,25 @@ export class ResponsesPage implements OnInit {
       });
       toast.present();
     }
+  }
+
+  // Helper method to convert Firebase Timestamp to JavaScript Date
+  private convertTimestampToDate(timestamp: any): Date {
+    if (!timestamp) {
+      return new Date();
+    }
+    
+    // Handle Firestore Timestamp objects
+    if (timestamp && typeof timestamp.toDate === 'function') {
+      return timestamp.toDate();
+    }
+    
+    // Handle timestamp objects with seconds and nanoseconds
+    if (timestamp && timestamp.seconds !== undefined) {
+      return new Date(timestamp.seconds * 1000);
+    }
+    
+    // If it's already a Date or timestamp number, return as is
+    return timestamp instanceof Date ? timestamp : new Date(timestamp);
   }
 }

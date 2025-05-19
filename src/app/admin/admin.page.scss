@@ -1,18 +1,219 @@
-.image-gallery {
+.fixed-logout-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+    --background: rgb(206, 1, 1);
+    --color: #eb445a;
+  }
+
+  .section-container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .segment-container {
+    margin: 16px 0;
+    background: #f4f5f8;
+    border-radius: 8px;
+    padding: 4px;
+  }
+
+  .reports-container {
+    margin-top: 16px;
+  }
+
+  .report-card {
+    margin: 16px 0;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .report-subtitle {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .priority-badge {
+    font-size: 0.8em;
+  }
+
+  .report-title {
+    font-size: 1.5em;
+    font-weight: 600;
+    color: var(--ion-color-dark);
+  }
+
+  .reporter-name {
+    font-size: 1.2em;
+    font-weight: 500;
+    margin-bottom: 8px;
+  }
+
+  .description {
+    white-space: pre-wrap;
+    margin-top: 12px;
+  }
+
+  .image-column {
+    padding: 16px;
+  }
+
+  .image-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 8px;
+    padding: 8px;
+  }
+
+  .report-image {
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+
+  .report-image:hover {
+    transform: scale(1.05);
+  }
+
+  .response-button {
+    margin-top: 16px;
+  }
+
+  ion-item {
+    --padding-start: 0;
+    --inner-padding-end: 0;
+  }
+
+  ion-icon {
+    margin-right: 8px;
+    color: var(--ion-color-medium);
+  }
+
+  // Common card styles
+.request-card, .pickup-card {
+  margin: 16px 0;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+// Request sections styling
+.request-title {
+  font-size: 1.3em;
+  font-weight: 600;
+  color: var(--ion-color-dark);
+}
+
+.request-subtitle {
   display: flex;
-  flex-direction: column;
   gap: 8px;
-  max-height: 300px;
-  overflow-y: auto;
+  margin-bottom: 8px;
 }
 
-.report-image {
-  width: 100%;
-  height: 100px;
-  object-fit: cover;
-  cursor: pointer;
+.status-badge {
+  font-size: 0.8em;
+  padding: 4px 8px;
+  border-radius: 4px;
 }
 
-.pickup-locations-section {
-  margin-top: 16px;
+// Pickup locations styling
+.pickup-header {
+  background: var(--ion-color-light);
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 16px;
 }
+
+.pickup-list {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.pickup-item {
+  --padding-start: 16px;
+  --padding-end: 16px;
+  --inner-padding-end: 16px;
+  border-bottom: 1px solid var(--ion-color-light);
+}
+
+.pickup-title {
+  font-size: 1.2em;
+  font-weight: 500;
+  color: var(--ion-color-dark);
+  margin-bottom: 8px;
+}
+
+.pickup-details {
+  color: var(--ion-color-medium);
+  font-size: 0.9em;
+  margin: 4px 0;
+}
+
+.schedule-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+// Form styling
+.form-card {
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin-bottom: 24px;
+}
+
+.form-title {
+  font-size: 1.4em;
+  font-weight: 600;
+  color: var(--ion-color-dark);
+  padding: 16px;
+  border-bottom: 1px solid var(--ion-color-light);
+}
+
+// Main navigation segment
+ion-segment {
+  padding: 8px;
+  background: var(--ion-color-light);
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+ion-segment-button {
+  --background-checked: var(--ion-color-primary);
+  --color-checked: white;
+  --border-radius: 6px;
+  --padding-top: 8px;
+  --padding-bottom: 8px;
+  font-weight: 500;
+}
+
+.admin-response {
+  margin-top: 12px !important;
+  
+  ion-icon {
+    vertical-align: top;
+  }
+  
+  span:first-of-type {
+    color: var(--ion-color-medium);
+    margin-left: 4px;
+  }
+}
+
+.response-text {
+  display: inline-block;
+  margin-left: 32px;
+  margin-top: 8px;
+  white-space: pre-wrap;
+  color: var(--ion-color-dark);
+  font-size: 0.95em;
+  line-height: 1.4;
+}
+

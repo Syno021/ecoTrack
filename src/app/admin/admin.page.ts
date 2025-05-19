@@ -1,8 +1,8 @@
-import { Component, OnInit, Injector, runInInjectionContext, NgZone, OnDestroy, AfterViewInit } from '@angular/core';
+import { Component, OnInit, Injector, runInInjectionContext, NgZone, OnDestroy, AfterViewInit, ApplicationRef, ChangeDetectorRef } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { Router } from '@angular/router';
-import { ToastController, AlertController } from '@ionic/angular';
+import { ToastController, AlertController, Platform } from '@ionic/angular';
 import * as L from 'leaflet';
 
 interface PickupLocation {
@@ -50,6 +50,13 @@ export class AdminPage implements OnInit, OnDestroy, AfterViewInit {
   completedRequests: any[] = [];
   pendingReports: any[] = [];
   resolvedReports: any[] = [];
+  
+  // Loading states for each collection
+  isLoadingPendingRequests = true;
+  isLoadingCompletedRequests = true;
+  isLoadingPendingReports = true;
+  isLoadingResolvedReports = true;
+  isLoadingPickupLocations = true;
 
   // Map related properties
   isMapVisible = false;
@@ -116,10 +123,14 @@ export class AdminPage implements OnInit, OnDestroy, AfterViewInit {
     private toastController: ToastController,
     private alertController: AlertController,
     private ngZone: NgZone,
-    private injector: Injector 
+    private injector: Injector,
+    private changeDetector: ChangeDetectorRef,
+    private platform: Platform,
+    private appRef: ApplicationRef
   ) {}
 
   async ngOnInit() {
+    // Check for authentication and admin status first
     this.fireAuth.authState.subscribe(async user => {
       if (!user) {
         this.router.navigate(['/auth']);
@@ -133,6 +144,7 @@ export class AdminPage implements OnInit, OnDestroy, AfterViewInit {
         return;
       }
       
+      // Load data after confirming user is authenticated and has admin rights
       this.loadData();
     });
   }
@@ -140,6 +152,9 @@ export class AdminPage implements OnInit, OnDestroy, AfterViewInit {
   ngAfterViewInit() {
     // Initialize map when view is ready and map section is visible
     this.initMapWhenVisible();
+    
+    // Force change detection after view init
+    this.changeDetector.detectChanges();
   }
 
   ngOnDestroy() {
@@ -163,21 +178,33 @@ export class AdminPage implements OnInit, OnDestroy, AfterViewInit {
     // Check if map container exists
     const mapElement = document.getElementById('map');
     if (!mapElement) {
+      console.error('Map element not found');
       return;
     }
 
-    // Initialize map with default view
-    this.map = L.map('map').setView([0, 0], 2);
-    
-    // Add OpenStreetMap tiles
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap contributors'
-    }).addTo(this.map);
+    try {
+      // Initialize map with default view
+      this.map = L.map('map').setView([0, 0], 2);
+      
+      // Add OpenStreetMap tiles
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+      }).addTo(this.map);
 
-    // Add click event to map
-    this.map.on('click', (e: L.LeafletMouseEvent) => {
-      this.reverseGeocode(e.latlng.lat, e.latlng.lng);
-    });
+      // Add click event to map
+      this.map.on('click', (e: L.LeafletMouseEvent) => {
+        this.reverseGeocode(e.latlng.lat, e.latlng.lng);
+      });
+      
+      // Force map to recalculate its size
+      setTimeout(() => {
+        if (this.map) {
+          this.map.invalidateSize();
+        }
+      }, 500);
+    } catch (error) {
+      console.error('Error initializing map:', error);
+    }
   }
 
   toggleMapVisibility() {
@@ -187,12 +214,19 @@ export class AdminPage implements OnInit, OnDestroy, AfterViewInit {
       setTimeout(() => {
         this.initMap();
       }, 300);
+    } else if (this.isMapVisible && this.map) {
+      // If map is already initialized, invalidate its size to ensure proper rendering
+      setTimeout(() => {
+        if (this.map) {
+          this.map.invalidateSize();
+        }
+      }, 300);
     }
   }
 
   // Toggle between manual and search-based address entry
-  toggleAddressEntryMode() {
-    this.manualAddressEntry = !this.manualAddressEntry;
+  toggleAddressEntryMode(event: any) {
+    this.manualAddressEntry = event.detail.checked;
     
     if (!this.manualAddressEntry) {
       // When switching back to search mode, reset address fields
@@ -298,6 +332,7 @@ export class AdminPage implements OnInit, OnDestroy, AfterViewInit {
         // Group results by location name for better organization
         const results = await response.json();
         this.searchResults = this.groupAndProcessResults(results);
+        this.changeDetector.detectChanges(); // Force update UI with search results
       } else {
         console.error('Search failed:', response.statusText);
         this.presentToast('Location search failed', 'danger');
@@ -367,6 +402,9 @@ export class AdminPage implements OnInit, OnDestroy, AfterViewInit {
         this.marker = L.marker([lat, lng]).addTo(this.map);
       }
     }
+    
+    // Force change detection
+    this.changeDetector.detectChanges();
   }
 
   async reverseGeocode(lat: number, lng: number) {
@@ -401,6 +439,9 @@ export class AdminPage implements OnInit, OnDestroy, AfterViewInit {
             this.marker = L.marker([lat, lng]).addTo(this.map);
           }
         }
+        
+        // Force change detection to update UI
+        this.changeDetector.detectChanges();
       } else {
         console.error('Reverse geocoding failed:', response.statusText);
       }
@@ -438,12 +479,15 @@ export class AdminPage implements OnInit, OnDestroy, AfterViewInit {
     try {
       const userDoc = await this.ngZone.run(() => {
         return runInInjectionContext(this.injector, async () => {
-          return await this.firestore.collection('users').doc(userId).get().toPromise();
+          const snapshot = await this.firestore.collection('users').doc(userId).get().toPromise();
+          return snapshot;
         });
       });
+      
       interface UserData {
         role?: string;
       }
+      
       const userData = userDoc?.data() as UserData;
       return userData?.role === 'admin';
     } catch (error) {
@@ -452,44 +496,138 @@ export class AdminPage implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
+  // Add this helper method at class level
+  private convertTimestamps(data: any): any {
+    if (!data) return data;
+    
+    const converted = { ...data };
+    
+    // Convert known timestamp fields
+    const timestampFields = ['date', 'createdAt', 'updatedAt', 'resolvedAt'];
+    
+    for (const field of timestampFields) {
+      if (converted[field] && typeof converted[field].toDate === 'function') {
+        converted[field] = converted[field].toDate();
+      }
+    }
+    
+    return converted;
+  }
+
   loadData() {
-    this.ngZone.run(() => {
-      return runInInjectionContext(this.injector, () => {
-        // Load pending requests
-        this.firestore.collection('requests', ref => ref.where('status', '==', 'pending'))
-          .valueChanges({ idField: 'id' })
-          .subscribe(data => {
-            this.pendingRequests = data;
-          });
+    console.log('Loading data from Firestore...');
+    
+    // Use runInInjectionContext to ensure proper injection context for Firebase operations
+    runInInjectionContext(this.injector, () => {
+      // Load pending requests
+      this.isLoadingPendingRequests = true;
+      this.firestore.collection('requests', ref => ref.where('status', '==', 'pending'))
+        .valueChanges({ idField: 'id' })
+        .subscribe({
+          next: (data) => {
+            console.log('Pending requests loaded:', data.length);
+            this.ngZone.run(() => {
+              this.pendingRequests = data.map(item => this.convertTimestamps(item));
+              this.isLoadingPendingRequests = false;
+              this.changeDetector.detectChanges();
+            });
+          },
+          error: (error) => {
+            console.error('Error loading pending requests:', error);
+            this.ngZone.run(() => {
+              this.presentToast('Error loading requests', 'danger');
+              this.isLoadingPendingRequests = false;
+            });
+          }
+        });
 
-        // Load completed requests
-        this.firestore.collection('requests', ref => ref.where('status', '==', 'completed'))
-          .valueChanges({ idField: 'id' })
-          .subscribe(data => {
-            this.completedRequests = data;
-          });
+      // Load completed requests
+      this.isLoadingCompletedRequests = true;
+      this.firestore.collection('requests', ref => ref.where('status', '==', 'completed'))
+        .valueChanges({ idField: 'id' })
+        .subscribe({
+          next: (data) => {
+            console.log('Completed requests loaded:', data.length);
+            this.ngZone.run(() => {
+              this.completedRequests = data.map(item => this.convertTimestamps(item));
+              this.isLoadingCompletedRequests = false;
+              this.changeDetector.detectChanges();
+            });
+          },
+          error: (error) => {
+            console.error('Error loading completed requests:', error);
+            this.ngZone.run(() => {
+              this.presentToast('Error loading requests', 'danger');
+              this.isLoadingCompletedRequests = false;
+            });
+          }
+        });
 
-        // Load pending reports
-        this.firestore.collection('reports', ref => ref.where('status', '==', 'pending'))
-          .valueChanges({ idField: 'id' })
-          .subscribe(data => {
-            this.pendingReports = data;
-          });
+      // Load pending reports
+      this.isLoadingPendingReports = true;
+      this.firestore.collection('reports', ref => ref.where('status', '==', 'pending'))
+        .valueChanges({ idField: 'id' })
+        .subscribe({
+          next: (data) => {
+            console.log('Pending reports loaded:', data.length);
+            this.ngZone.run(() => {
+              this.pendingReports = data.map(item => this.convertTimestamps(item));
+              this.isLoadingPendingReports = false;
+              this.changeDetector.detectChanges();
+            });
+          },
+          error: (error) => {
+            console.error('Error loading pending reports:', error);
+            this.ngZone.run(() => {
+              this.presentToast('Error loading reports', 'danger');
+              this.isLoadingPendingReports = false;
+            });
+          }
+        });
 
-        // Load resolved reports
-        this.firestore.collection('reports', ref => ref.where('status', '==', 'resolved'))
-          .valueChanges({ idField: 'id' })
-          .subscribe(data => {
-            this.resolvedReports = data;
-          });
+      // Load resolved reports
+      this.isLoadingResolvedReports = true;
+      this.firestore.collection('reports', ref => ref.where('status', '==', 'resolved'))
+        .valueChanges({ idField: 'id' })
+        .subscribe({
+          next: (data) => {
+            console.log('Resolved reports loaded:', data.length);
+            this.ngZone.run(() => {
+              this.resolvedReports = data.map(item => this.convertTimestamps(item));
+              this.isLoadingResolvedReports = false;
+              this.changeDetector.detectChanges();
+            });
+          },
+          error: (error) => {
+            console.error('Error loading resolved reports:', error);
+            this.ngZone.run(() => {
+              this.presentToast('Error loading reports', 'danger');
+              this.isLoadingResolvedReports = false;
+            });
+          }
+        });
 
-        // Load pickup locations
-        this.firestore.collection('schedules')
-          .valueChanges({ idField: 'id' })
-          .subscribe(data => {
-            this.pickupLocations = data as PickupLocation[];
-          });
-      });
+      // Load pickup locations
+      this.isLoadingPickupLocations = true;
+      this.firestore.collection('schedules')
+        .valueChanges({ idField: 'id' })
+        .subscribe({
+          next: (data) => {
+            console.log('Pickup locations loaded:', data.length);
+            this.ngZone.run(() => {
+              this.pickupLocations = data.map(item => this.convertTimestamps(item)) as PickupLocation[];
+              this.isLoadingPickupLocations = false;
+              this.changeDetector.detectChanges();
+            });
+          },
+          error: (error) => {
+            console.error('Error loading schedules:', error);
+            this.ngZone.run(() => {
+              this.presentToast('Error loading schedules', 'danger');
+              this.isLoadingPickupLocations = false;
+            });
+          }
+        });
     });
   }
 
@@ -631,27 +769,53 @@ export class AdminPage implements OnInit, OnDestroy, AfterViewInit {
   }
 
   async deleteLocation(id: string) {
-    try {
-      await this.ngZone.run(() => {
-        return runInInjectionContext(this.injector, async () => {
-          await this.firestore.collection('schedules').doc(id).delete();
-          this.presentToast('Collection schedule deleted successfully', 'success');
-        });
-      });
-    } catch (error) {
-      this.presentToast('Error deleting collection schedule', 'danger');
-    }
+    // Add confirmation before deletion
+    const alert = await this.alertController.create({
+      header: 'Confirm Deletion',
+      message: 'Are you sure you want to delete this collection schedule?',
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel'
+        },
+        {
+          text: 'Delete',
+          role: 'destructive',
+          handler: async () => {
+            try {
+              await this.ngZone.run(() => {
+                return runInInjectionContext(this.injector, async () => {
+                  await this.firestore.collection('schedules').doc(id).delete();
+                  this.presentToast('Collection schedule deleted successfully', 'success');
+                });
+              });
+            } catch (error) {
+              this.presentToast('Error deleting collection schedule', 'danger');
+            }
+          }
+        }
+      ]
+    });
+    
+    await alert.present();
   }
 
   // Method for viewing images
   async viewImage(photo: string) {
-    // Implementation for image viewing modal
+    // Create a modal to view the image in larger size
+    const alert = await this.alertController.create({
+      header: 'Image',
+      message: `<div class="image-modal"><img src="${photo}" alt="Report image" /></div>`,
+      buttons: ['Close']
+    });
+    
+    await alert.present();
   }
 
   async logout() {
     try {
       await this.fireAuth.signOut();
-      this.router.navigate(['/']);
+      this.router.navigate(['/home']);
     } catch (error) {
       this.presentToast('Unable to log out. Please try again.','danger');
     }

@@ -16,8 +16,8 @@
   </ion-segment>
 
   <!-- Reports & Requests Section -->
-  <div *ngIf="selectedMainSection === 'requests-reports'">
-    <ion-segment [(ngModel)]="selectedSegment" color="secondary">
+  <div *ngIf="selectedMainSection === 'requests-reports'" class="section-container">
+    <ion-segment [(ngModel)]="selectedSegment" color="secondary" class="segment-container">
       <ion-segment-button value="pending-requests">
         <ion-label>Pending Requests</ion-label>
       </ion-segment-button>
@@ -34,10 +34,13 @@
 
     <!-- Pending Requests -->
     <div *ngIf="selectedSegment === 'pending-requests'">
-      <ion-card *ngFor="let request of pendingRequests">
+      <ion-card *ngFor="let request of pendingRequests" class="request-card">
         <ion-card-header>
-          <ion-card-subtitle>Request #{{request.id}}</ion-card-subtitle>
-          <ion-card-title>{{request.wasteType}}</ion-card-title>
+          <ion-card-subtitle class="request-subtitle">
+            <ion-badge color="primary">Request #{{request.id}}</ion-badge>
+            <ion-badge color="warning" class="status-badge">Pending</ion-badge>
+          </ion-card-subtitle>
+          <ion-card-title class="request-title">{{request.wasteType}}</ion-card-title>
         </ion-card-header>
         <ion-card-content>
           <ion-list>
@@ -60,10 +63,13 @@
 
     <!-- Completed Requests -->
     <div *ngIf="selectedSegment === 'completed-requests'">
-      <ion-card *ngFor="let request of completedRequests">
+      <ion-card *ngFor="let request of completedRequests" class="request-card">
         <ion-card-header>
-          <ion-card-subtitle>Completed Request #{{request.id}}</ion-card-subtitle>
-          <ion-card-title>{{request.wasteType}}</ion-card-title>
+          <ion-card-subtitle class="request-subtitle">
+            <ion-badge color="primary">Request #{{request.id}}</ion-badge>
+            <ion-badge color="success" class="status-badge">Completed</ion-badge>
+          </ion-card-subtitle>
+          <ion-card-title class="request-title">{{request.wasteType}}</ion-card-title>
         </ion-card-header>
         <ion-card-content>
           <ion-list>
@@ -80,58 +86,73 @@
     </div>
 
     <!-- Pending Reports -->
-    <div *ngIf="selectedSegment === 'pending-reports'">
-      <ion-card *ngFor="let report of pendingReports">
-        <ion-row>
-          <ion-col size="8">
-            <ion-card-header>
-              <ion-card-subtitle>Report #{{report.id}} - {{report.priority}} Priority</ion-card-subtitle>
-              <ion-card-title>{{report.issueType}}</ion-card-title>
-            </ion-card-header>
-            <ion-card-content>
-              <ion-list>
-                <ion-item>
-                  <ion-label>
-                    <h2>{{report.name}}</h2>
-                    <p>{{report.email}}</p>
-                    <p>Location: {{report.location}}</p>
-                    <p>Description: {{report.description}}</p>
-                  </ion-label>
-                </ion-item>
-              </ion-list>
-              <ion-button expand="block" color="primary" (click)="respondToReport(report.id)">
-                Respond to Report
-              </ion-button>
-            </ion-card-content>
-          </ion-col>
-          <ion-col size="4" *ngIf="report.photos?.length">
-            <div class="image-gallery">
-              <ion-img 
-                *ngFor="let photo of report.photos" 
-                [src]="photo" 
-                class="report-image"
-                (click)="viewImage(photo)">
-              </ion-img>
-            </div>
-          </ion-col>
-        </ion-row>
+    <div *ngIf="selectedSegment === 'pending-reports'" class="reports-container">
+      <ion-card *ngFor="let report of pendingReports" class="report-card">
+        <ion-grid>
+          <ion-row>
+            <ion-col size="12" size-md="8">
+              <ion-card-header>
+                <ion-card-subtitle class="report-subtitle">
+                  <ion-badge color="primary">Report #{{report.id}}</ion-badge>
+                  <ion-badge [color]="report.priority === 'High' ? 'danger' : 'warning'" class="priority-badge">
+                    {{report.priority}} Priority
+                  </ion-badge>
+                </ion-card-subtitle>
+                <ion-card-title class="report-title">{{report.issueType}}</ion-card-title>
+              </ion-card-header>
+              <ion-card-content>
+                <ion-list lines="none">
+                  <ion-item>
+                    <ion-label>
+                      <h2 class="reporter-name">{{report.name}}</h2>
+                      <p><ion-icon name="mail-outline"></ion-icon> {{report.email}}</p>
+                      <p><ion-icon name="location-outline"></ion-icon> {{report.location}}</p>
+                      <p class="description"><ion-icon name="document-text-outline"></ion-icon> {{report.description}}</p>
+                    </ion-label>
+                  </ion-item>
+                </ion-list>
+                <ion-button expand="block" color="primary" (click)="respondToReport(report.id)" class="response-button">
+                  <ion-icon name="chatbubble-outline" slot="start"></ion-icon>
+                  Respond to Report
+                </ion-button>
+              </ion-card-content>
+            </ion-col>
+            <ion-col size="12" size-md="4" *ngIf="report.photos?.length" class="image-column">
+              <div class="image-gallery">
+                <ion-img 
+                  *ngFor="let photo of report.photos" 
+                  [src]="photo" 
+                  class="report-image"
+                  (click)="viewImage(photo)">
+                </ion-img>
+              </div>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
       </ion-card>
     </div>
 
     <!-- Resolved Reports -->
-    <div *ngIf="selectedSegment === 'resolved-reports'">
-      <ion-card *ngFor="let report of resolvedReports">
+    <div *ngIf="selectedSegment === 'resolved-reports'" class="reports-container">
+      <ion-card *ngFor="let report of resolvedReports" class="report-card">
         <ion-card-header>
-          <ion-card-subtitle>Resolved Report #{{report.id}}</ion-card-subtitle>
-          <ion-card-title>{{report.issueType}}</ion-card-title>
+          <ion-card-subtitle class="report-subtitle">
+            <ion-badge color="primary">Report #{{report.id}}</ion-badge>
+            <ion-badge color="success" class="status-badge">Resolved</ion-badge>
+          </ion-card-subtitle>
+          <ion-card-title class="report-title">{{report.issueType}}</ion-card-title>
         </ion-card-header>
         <ion-card-content>
-          <ion-list>
+          <ion-list lines="none">
             <ion-item>
               <ion-label>
-                <h2>{{report.name}}</h2>
-                <p>Resolution Date: {{report.resolvedAt | date}}</p>
-                <p>Admin Response: {{report.adminResponse}}</p>
+                <h2 class="reporter-name">{{report.name}}</h2>
+                <p><ion-icon name="calendar-outline"></ion-icon> Resolution Date: {{report.resolvedAt | date}}</p>
+                <p class="admin-response">
+                  <ion-icon name="chatbubble-outline"></ion-icon>
+                  <span>Admin Response:</span><br>
+                  <span class="response-text">{{report.adminResponse}}</span>
+                </p>
               </ion-label>
             </ion-item>
           </ion-list>
@@ -142,9 +163,9 @@
 
   <!-- Pickup Locations Section -->
   <div *ngIf="selectedMainSection === 'pickup-locations'">
-    <ion-card>
+    <ion-card class="form-card">
       <ion-card-header>
-        <ion-card-title>Add New Collection Schedule</ion-card-title>
+        <h2 class="form-title">Add New Collection Schedule</h2>
       </ion-card-header>
       <ion-card-content>
         <form (ngSubmit)="createPickupLocation()">
@@ -156,7 +177,11 @@
           <!-- Toggle between manual and search-based address entry -->
           <ion-item>
             <ion-label>Manual Address Entry</ion-label>
-            <ion-toggle [(ngModel)]="manualAddressEntry" name="manualAddressEntry" (ionChange)="toggleAddressEntryMode()"></ion-toggle>
+            <ion-toggle 
+              [(ngModel)]="manualAddressEntry" 
+              (ionChange)="toggleAddressEntryMode($event)"
+              name="manualAddressEntry">
+            </ion-toggle>
           </ion-item>
 
           <!-- Search-based address entry (visible when manualAddressEntry is false) -->
@@ -291,18 +316,23 @@
       </ion-card-content>
     </ion-card>
 
-    <ion-list>
-      <ion-list-header>
-        <ion-label>Collection Schedules</ion-label>
-      </ion-list-header>
+    <div class="pickup-header">
+      <h2>Collection Schedules</h2>
+    </div>
 
-      <ion-item *ngFor="let location of pickupLocations">
+    <ion-list class="pickup-list">
+      <ion-item *ngFor="let location of pickupLocations" class="pickup-item">
         <ion-label>
-          <h2>{{location.location}}</h2>
-          <p>{{location.address}}</p>
-          <p>Schedule: Every {{location.weekday}} at {{location.time}}</p>
-          <p>Waste Type: {{location.wasteType | titlecase}}</p>
-          <p>Status: {{location.status}}</p>
+          <h2 class="pickup-title">{{location.location}}</h2>
+          <p class="pickup-details">{{location.address}}</p>
+          <div class="schedule-info">
+            <ion-icon name="calendar-outline"></ion-icon>
+            <span>Every {{location.weekday}} at {{location.time}}</span>
+          </div>
+          <div class="schedule-info">
+            <ion-icon name="trash-outline"></ion-icon>
+            <span>{{location.wasteType | titlecase}}</span>
+          </div>
         </ion-label>
         <ion-button slot="end" color="danger" (click)="deleteLocation(location.id)">
           <ion-icon name="trash"></ion-icon>
@@ -322,13 +352,3 @@
   <ion-icon name="log-out-outline"></ion-icon>
 </ion-button>
 
-<style>
-  .fixed-logout-button {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    z-index: 1000;
-    color: red;
-    background-color: white;
-  }
-</style>

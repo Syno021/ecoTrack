@@ -1,9 +1,7 @@
-
-
 <ion-content fullscreen="true">
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">auth</ion-title>
+      <ion-title size="large">Authentication</ion-title>
     </ion-toolbar>
   </ion-header>
   
@@ -17,87 +15,290 @@
     </div>
     
     <div class="form-tabs">
-      <div class="tab" [class.active]="activeTab === 'login'" (click)="switchTab('login')">Login</div>
-      <div class="tab" [class.active]="activeTab === 'register'" (click)="switchTab('register')">Register</div>
+      <div class="tab" 
+           [class.active]="activeTab === 'login'" 
+           [class.disabled]="isSubmitting"
+           (click)="switchTab('login')">
+        Login
+      </div>
+      <div class="tab" 
+           [class.active]="activeTab === 'register'" 
+           [class.disabled]="isSubmitting"
+           (click)="switchTab('register')">
+        Register
+      </div>
     </div>
     
     <div class="form-container">
       <!-- Login Form -->
-      <form class="form" [class.active]="activeTab === 'login'" [formGroup]="loginForm" (ngSubmit)="login()" *ngIf="activeTab === 'login'">
+      <form class="form" 
+            [class.active]="activeTab === 'login'" 
+            [formGroup]="loginForm" 
+            (ngSubmit)="login()" 
+            *ngIf="activeTab === 'login'"
+            novalidate>
+        
         <div class="form-group">
-          <label class="input-label" for="login-email">Email</label>
-          <input type="email" id="login-email" class="input-field" formControlName="email" placeholder="your@email.com">
-          <small class="error-message" *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
-            Please enter a valid email address
-          </small>
+          <label class="input-label" for="login-email">
+            Email <span class="required">*</span>
+          </label>
+          <div class="input-container">
+            <input type="email" 
+                   id="login-email" 
+                   class="input-field" 
+                   [class.invalid]="isFieldInvalid(loginForm, 'email')"
+                   [class.valid]="loginForm.get('email')?.valid && loginForm.get('email')?.touched"
+                   formControlName="email" 
+                   placeholder="your@email.com"
+                   autocomplete="email"
+                   [disabled]="isSubmitting">
+            <ion-icon name="mail-outline" class="input-icon"></ion-icon>
+          </div>
+          <div class="error-container" *ngIf="isFieldInvalid(loginForm, 'email')">
+            <small class="error-message">
+              <ion-icon name="alert-circle" class="error-icon"></ion-icon>
+              {{ getFieldError(loginForm, 'email') }}
+            </small>
+          </div>
         </div>
         
         <div class="form-group">
-          <label class="input-label" for="login-password">Password</label>
-          <input type="password" id="login-password" class="input-field" formControlName="password" placeholder="Enter your password">
-          <small class="error-message" *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
-            Password is required (min 6 characters)
-          </small>
+          <label class="input-label" for="login-password">
+            Password <span class="required">*</span>
+          </label>
+          <div class="input-container">
+            <input [type]="showPassword ? 'text' : 'password'" 
+                   id="login-password" 
+                   class="input-field" 
+                   [class.invalid]="isFieldInvalid(loginForm, 'password')"
+                   [class.valid]="loginForm.get('password')?.valid && loginForm.get('password')?.touched"
+                   formControlName="password" 
+                   placeholder="Enter your password"
+                   autocomplete="current-password"
+                   [disabled]="isSubmitting">
+            <ion-icon name="lock-closed-outline" class="input-icon"></ion-icon>
+            <ion-icon [name]="showPassword ? 'eye-off-outline' : 'eye-outline'" 
+                      class="toggle-password" 
+                      (click)="togglePasswordVisibility('password')"></ion-icon>
+          </div>
+          <div class="error-container" *ngIf="isFieldInvalid(loginForm, 'password')">
+            <small class="error-message">
+              <ion-icon name="alert-circle" class="error-icon"></ion-icon>
+              {{ getFieldError(loginForm, 'password') }}
+            </small>
+          </div>
         </div>
         
         <div class="forgot-password">
-          <a href="javascript:void(0)" (click)="forgotPassword()">Forgot password?</a>
+          <a href="javascript:void(0)" (click)="forgotPassword()" [class.disabled]="isSubmitting">
+            Forgot password?
+          </a>
         </div>
         
         <div class="form-group">
-          <button type="submit" class="btn-primary" [disabled]="loginForm.invalid">LOGIN</button>
+          <button type="submit" 
+                  class="btn-primary" 
+                  [disabled]="loginForm.invalid || isSubmitting">
+            <span *ngIf="!isSubmitting">LOGIN</span>
+            <span *ngIf="isSubmitting">
+              <ion-spinner name="crescent" class="button-spinner"></ion-spinner>
+              Logging in...
+            </span>
+          </button>
         </div>
         
-        <div class="social-login">
+        <div class="social-login" *ngIf="!isSubmitting">
           <div class="social-login-text">Or login with</div>
           <div class="social-buttons">
-            <!--<div class="social-button" (click)="loginWithFacebook()">f</div>-->
-            <div class="social-button" (click)="loginWithGoogle()">G</div>
-            <!--<div class="social-button" (click)="loginWithLinkedIn()">in</div>-->
+            <button type="button" class="social-button google" (click)="loginWithGoogle()" [disabled]="isSubmitting">
+              <ion-icon name="logo-google"></ion-icon>
+              <span>Google</span>
+            </button>
+            <!-- Uncomment when ready to use
+            <button type="button" class="social-button facebook" (click)="loginWithFacebook()" [disabled]="isSubmitting">
+              <ion-icon name="logo-facebook"></ion-icon>
+              <span>Facebook</span>
+            </button>
+            <button type="button" class="social-button linkedin" (click)="loginWithLinkedIn()" [disabled]="isSubmitting">
+              <ion-icon name="logo-linkedin"></ion-icon>
+              <span>LinkedIn</span>
+            </button>
+            -->
           </div>
         </div>
       </form>
       
       <!-- Register Form -->
-      <form class="form" [class.active]="activeTab === 'register'" [formGroup]="registerForm" (ngSubmit)="register()" *ngIf="activeTab === 'register'">
+      <form class="form" 
+            [class.active]="activeTab === 'register'" 
+            [formGroup]="registerForm" 
+            (ngSubmit)="register()" 
+            *ngIf="activeTab === 'register'"
+            novalidate>
+        
         <div class="form-group">
-          <label class="input-label" for="register-name">Full Name</label>
-          <input type="text" id="register-name" class="input-field" formControlName="fullName" placeholder="John Doe">
-          <small class="error-message" *ngIf="registerForm.get('fullName')?.invalid && registerForm.get('fullName')?.touched">
-            Full name is required
-          </small>
+          <label class="input-label" for="register-name">
+            Full Name <span class="required">*</span>
+          </label>
+          <div class="input-container">
+            <input type="text" 
+                   id="register-name" 
+                   class="input-field" 
+                   [class.invalid]="isFieldInvalid(registerForm, 'fullName')"
+                   [class.valid]="registerForm.get('fullName')?.valid && registerForm.get('fullName')?.touched"
+                   formControlName="fullName" 
+                   placeholder="John Doe"
+                   autocomplete="name"
+                   [disabled]="isSubmitting">
+            <ion-icon name="person-outline" class="input-icon"></ion-icon>
+          </div>
+          <div class="error-container" *ngIf="isFieldInvalid(registerForm, 'fullName')">
+            <small class="error-message">
+              <ion-icon name="alert-circle" class="error-icon"></ion-icon>
+              {{ getFieldError(registerForm, 'fullName') }}
+            </small>
+          </div>
         </div>
         
         <div class="form-group">
-          <label class="input-label" for="register-email">Email</label>
-          <input type="email" id="register-email" class="input-field" formControlName="email" placeholder="your@email.com">
-          <small class="error-message" *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched">
-            Please enter a valid email address
-          </small>
+          <label class="input-label" for="register-email">
+            Email <span class="required">*</span>
+          </label>
+          <div class="input-container">
+            <input type="email" 
+                   id="register-email" 
+                   class="input-field" 
+                   [class.invalid]="isFieldInvalid(registerForm, 'email')"
+                   [class.valid]="registerForm.get('email')?.valid && registerForm.get('email')?.touched"
+                   formControlName="email" 
+                   placeholder="your@email.com"
+                   autocomplete="email"
+                   [disabled]="isSubmitting">
+            <ion-icon name="mail-outline" class="input-icon"></ion-icon>
+          </div>
+          <div class="error-container" *ngIf="isFieldInvalid(registerForm, 'email')">
+            <small class="error-message">
+              <ion-icon name="alert-circle" class="error-icon"></ion-icon>
+              {{ getFieldError(registerForm, 'email') }}
+            </small>
+          </div>
         </div>
         
         <div class="form-group">
-          <label class="input-label" for="register-password">Password</label>
-          <input type="password" id="register-password" class="input-field" formControlName="password" placeholder="Create a password">
-          <small class="error-message" *ngIf="registerForm.get('password')?.invalid && registerForm.get('password')?.touched">
-            Password must be at least 6 characters
-          </small>
+          <label class="input-label" for="register-password">
+            Password <span class="required">*</span>
+          </label>
+          <div class="input-container">
+            <input [type]="showPassword ? 'text' : 'password'" 
+                   id="register-password" 
+                   class="input-field" 
+                   [class.invalid]="isFieldInvalid(registerForm, 'password')"
+                   [class.valid]="registerForm.get('password')?.valid && registerForm.get('password')?.touched"
+                   formControlName="password" 
+                   placeholder="Create a strong password"
+                   autocomplete="new-password"
+                   [disabled]="isSubmitting">
+            <ion-icon name="lock-closed-outline" class="input-icon"></ion-icon>
+            <ion-icon [name]="showPassword ? 'eye-off-outline' : 'eye-outline'" 
+                      class="toggle-password" 
+                      (click)="togglePasswordVisibility('password')"></ion-icon>
+          </div>
+          <div class="error-container" *ngIf="isFieldInvalid(registerForm, 'password')">
+            <small class="error-message">
+              <ion-icon name="alert-circle" class="error-icon"></ion-icon>
+              {{ getFieldError(registerForm, 'password') }}
+            </small>
+          </div>
+          <div class="password-requirements" *ngIf="registerForm.get('password')?.touched && registerForm.get('password')?.errors">
+            <small class="requirement-text">Password must contain:</small>
+            <ul class="requirements-list">
+              <li [class.met]="!registerForm.get('password')?.errors?.['minLength']">
+                <ion-icon [name]="!registerForm.get('password')?.errors?.['minLength'] ? 'checkmark-circle' : 'close-circle'"></ion-icon>
+                At least 8 characters
+              </li>
+              <li [class.met]="!registerForm.get('password')?.errors?.['requiresLowercase']">
+                <ion-icon [name]="!registerForm.get('password')?.errors?.['requiresLowercase'] ? 'checkmark-circle' : 'close-circle'"></ion-icon>
+                One lowercase letter
+              </li>
+              <li [class.met]="!registerForm.get('password')?.errors?.['requiresUppercase']">
+                <ion-icon [name]="!registerForm.get('password')?.errors?.['requiresUppercase'] ? 'checkmark-circle' : 'close-circle'"></ion-icon>
+                One uppercase letter
+              </li>
+              <li [class.met]="!registerForm.get('password')?.errors?.['requiresNumber']">
+                <ion-icon [name]="!registerForm.get('password')?.errors?.['requiresNumber'] ? 'checkmark-circle' : 'close-circle'"></ion-icon>
+                One number
+              </li>
+              <li [class.met]="!registerForm.get('password')?.errors?.['requiresSpecialChar']">
+                <ion-icon [name]="!registerForm.get('password')?.errors?.['requiresSpecialChar'] ? 'checkmark-circle' : 'close-circle'"></ion-icon>
+                One special character (&#64;&#36;&#33;&#37;&#42;&#63;&#38;)
+              </li>
+            </ul>
+          </div>
         </div>
         
         <div class="form-group">
-          <label class="input-label" for="register-confirm">Confirm Password</label>
-          <input type="password" id="register-confirm" class="input-field" formControlName="confirmPassword" placeholder="Confirm your password">
-          <small class="error-message" *ngIf="registerForm.get('confirmPassword')?.touched && registerForm.hasError('mismatch')">
-            Passwords do not match
-          </small>
+          <label class="input-label" for="register-confirm-password">
+            Confirm Password <span class="required">*</span>
+          </label>
+          <div class="input-container">
+            <input [type]="showConfirmPassword ? 'text' : 'password'" 
+                   id="register-confirm-password" 
+                   class="input-field" 
+                   [class.invalid]="isFieldInvalid(registerForm, 'confirmPassword') || registerForm.errors?.['passwordMismatch']"
+                   [class.valid]="registerForm.get('confirmPassword')?.valid && registerForm.get('confirmPassword')?.touched && !registerForm.errors?.['passwordMismatch']"
+                   formControlName="confirmPassword" 
+                   placeholder="Confirm your password"
+                   autocomplete="new-password"
+                   [disabled]="isSubmitting">
+            <ion-icon name="lock-closed-outline" class="input-icon"></ion-icon>
+            <ion-icon [name]="showConfirmPassword ? 'eye-off-outline' : 'eye-outline'" 
+                      class="toggle-password" 
+                      (click)="togglePasswordVisibility('confirmPassword')"></ion-icon>
+          </div>
+          <div class="error-container" *ngIf="isFieldInvalid(registerForm, 'confirmPassword')">
+            <small class="error-message">
+              <ion-icon name="alert-circle" class="error-icon"></ion-icon>
+              {{ getFieldError(registerForm, 'confirmPassword') }}
+            </small>
+          </div>
+          <div class="error-container" *ngIf="registerForm.errors?.['passwordMismatch'] && registerForm.get('confirmPassword')?.touched">
+            <small class="error-message">
+              <ion-icon name="alert-circle" class="error-icon"></ion-icon>
+              Passwords do not match
+            </small>
+          </div>
         </div>
         
         <div class="form-group">
-          <button type="submit" class="btn-primary" [disabled]="registerForm.invalid">CREATE ACCOUNT</button>
+          <button type="submit" 
+                  class="btn-primary" 
+                  [disabled]="registerForm.invalid || isSubmitting">
+            <span *ngIf="!isSubmitting">CREATE ACCOUNT</span>
+            <span *ngIf="isSubmitting">
+              <ion-spinner name="crescent" class="button-spinner"></ion-spinner>
+              Creating account...
+            </span>
+          </button>
         </div>
         
-        <div class="footer-text">
-          By signing up, you agree to our <a href="#" style="color: var(--ion-color-primary);">Terms of Service</a> and <a href="#" style="color: var(--ion-color-primary);">Privacy Policy</a>
+        <div class="social-login" *ngIf="!isSubmitting">
+          <div class="social-login-text">Or register with</div>
+          <div class="social-buttons">
+            <button type="button" class="social-button google" (click)="loginWithGoogle()" [disabled]="isSubmitting">
+              <ion-icon name="logo-google"></ion-icon>
+              <span>Google</span>
+            </button>
+            <!-- Uncomment when ready to use
+            <button type="button" class="social-button facebook" (click)="loginWithFacebook()" [disabled]="isSubmitting">
+              <ion-icon name="logo-facebook"></ion-icon>
+              <span>Facebook</span>
+            </button>
+            <button type="button" class="social-button linkedin" (click)="loginWithLinkedIn()" [disabled]="isSubmitting">
+              <ion-icon name="logo-linkedin"></ion-icon>
+              <span>LinkedIn</span>
+            </button>
+            -->
+          </div>
         </div>
       </form>
     </div>

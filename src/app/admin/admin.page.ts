@@ -815,9 +815,23 @@ export class AdminPage implements OnInit, OnDestroy, AfterViewInit {
   async logout() {
     try {
       await this.fireAuth.signOut();
-      this.router.navigate(['/home']);
+      // Clear any cached data
+      this.pendingRequests = [];
+      this.completedRequests = [];
+      this.pendingReports = [];
+      this.resolvedReports = [];
+      this.pickupLocations = [];
+      
+      // Force clear auth state
+      await this.fireAuth.updateCurrentUser(null);
+      
+      // Navigate to home and clear navigation history
+      await this.router.navigate(['/home'], { replaceUrl: true });
+      
+      this.presentToast('Logged out successfully', 'success');
     } catch (error) {
-      this.presentToast('Unable to log out. Please try again.','danger');
+      console.error('Logout error:', error);
+      this.presentToast('Unable to log out. Please try again.', 'danger');
     }
   }
 }

@@ -1,5 +1,4 @@
-
-    :root {
+:root {
       --ion-color-primary: #0A8754;
       --ion-color-primary-rgb: 10, 135, 84;
       --ion-color-primary-contrast: #ffffff;
@@ -8,197 +7,328 @@
       --ion-color-tertiary-contrast: #000000;
       --ion-color-secondary: #2C786C;
       --ion-color-light: #f4f5f8;
+      --card-background-light: #ffffff;
+      --card-background-dark: #1e1e1e;
+      --text-color-light: #333333;
+      --text-color-dark: #ffffff;
+      --border-color-light: #ddd;
+      --border-color-dark: #404040;
+    }
+    
+    :host {
+      --input-padding: 12px;
+      --input-height: 48px;
+      --input-border-radius: 8px;
+      --button-height: 48px;
     }
     
     .auth-container {
       display: flex;
       flex-direction: column;
       padding: 20px;
-      max-width: 500px;
+      max-width: 450px;
       margin: 0 auto;
+      width: 100%;
     }
     
     .logo-container {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 20px;
-    }
-    
-    .logo {
-      width: 150px;
-      height: 150px;
-      background-color: var(--ion-color-primary);
-      border-radius: 50%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      color: white;
-      font-size: 40px;
+      text-align: center;
+      margin: 2rem 0;
+      
+      .logo {
+        display: inline-flex;
+        padding: 1.5rem;
+        border-radius: 50%;
+        background: var(--ion-color-primary-tint);
+        color: var(--ion-color-primary);
+      }
     }
     
     .form-tabs {
       display: flex;
-      margin-bottom: 20px;
-      border-bottom: 1px solid #e0e0e0;
-    }
-    
-    .tab {
-      flex: 1;
-      text-align: center;
-      padding: 15px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-    
-    .tab.active {
-      color: var(--ion-color-primary);
-      border-bottom: 2px solid var(--ion-color-primary);
-      font-weight: bold;
+      margin-bottom: 2rem;
+      border-bottom: 2px solid var(--ion-color-light-shade);
+      
+      .tab {
+        flex: 1;
+        text-align: center;
+        padding: 1rem;
+        cursor: pointer;
+        color: var(--ion-color-medium);
+        position: relative;
+        transition: all 0.3s ease;
+        
+        &.active {
+          color: var(--ion-color-primary);
+          font-weight: 500;
+          
+          &:after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--ion-color-primary);
+          }
+        }
+        
+        &.disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+      }
     }
     
     .form-container {
-      background-color: white;
-      border-radius: 15px;
-      padding: 20px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-    
-    .form {
-      display: none;
-    }
-    
-    .form.active {
-      display: block;
+      .form {
+        display: none;
+        
+        &.active {
+          display: block;
+        }
+      }
     }
     
     .form-group {
-      margin-bottom: 20px;
+      margin-bottom: 1.5rem;
     }
     
     .input-label {
       display: block;
       margin-bottom: 8px;
       font-weight: 500;
-      color: #333;
+      color: var(--ion-color-dark);
+      
+      .required {
+        color: var(--ion-color-danger);
+      }
     }
     
-    .input-field {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      font-size: 16px;
+    .input-container {
+      position: relative;
+      
+      .input-field {
+        width: 100%;
+        height: var(--input-height);
+        padding: var(--input-padding);
+        padding-left: calc(var(--input-height) - 4px);
+        padding-right: calc(var(--input-height) - 4px);
+        border: 1px solid var(--ion-color-medium-tint);
+        border-radius: var(--input-border-radius);
+        font-size: 1rem;
+        transition: border-color 0.3s ease;
+        
+        &:focus {
+          outline: none;
+          border-color: var(--ion-color-primary);
+        }
+        
+        &.invalid {
+          border-color: var(--ion-color-danger);
+        }
+        
+        &.valid {
+          border-color: var(--ion-color-success);
+        }
+        
+        &:disabled {
+          background-color: var(--ion-color-light);
+          cursor: not-allowed;
+        }
+      }
+      
+      .input-icon {
+        position: absolute;
+        left: calc(var(--input-padding) + 2px);
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 1.25rem;
+        color: var(--ion-color-medium);
+      }
+      
+      .toggle-password {
+        position: absolute;
+        right: var(--input-padding);
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 1.25rem;
+        color: var(--ion-color-medium);
+        cursor: pointer;
+      }
     }
     
-    .input-field:focus {
-      border-color: var(--ion-color-primary);
-      outline: none;
-    }
-    
-    .btn-primary {
-      background-color: var(--ion-color-tertiary);
-      color: black;
-      border: none;
-      padding: 14px;
-      width: 100%;
-      border-radius: 8px;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-    
-    .btn-primary:hover {
-      background-color: #e89a20;
+    .error-container {
+      margin-top: 4px;
+      
+      .error-message {
+        color: var(--ion-color-danger);
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 0.875rem;
+        
+        .error-icon {
+          font-size: 1rem;
+        }
+      }
     }
     
     .forgot-password {
       text-align: right;
-      margin-top: 10px;
+      margin-bottom: 1.5rem;
+      
+      a {
+        color: var(--ion-color-primary);
+        text-decoration: none;
+        font-size: 0.875rem;
+        
+        &.disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+      }
     }
     
-    .forgot-password a {
-      color: var(--ion-color-primary);
-      text-decoration: none;
-    }
-    
-    .footer-text {
-      text-align: center;
-      margin-top: 20px;
-      color: #666;
-    }
-    
-    .recycling-icons {
-      display: flex;
-      justify-content: space-around;
-      margin-top: 30px;
-      color: var(--ion-color-secondary);
-      font-size: 24px;
-    }
-    
-    .social-login {
-      margin-top: 20px;
-      text-align: center;
-    }
-    
-    .social-login-text {
-      position: relative;
-      margin-bottom: 15px;
-    }
-    
-    .social-login-text::before,
-    .social-login-text::after {
-      content: "";
-      display: block;
-      width: 40%;
-      height: 1px;
-      background-color: #ddd;
-      position: absolute;
-      top: 50%;
-    }
-    
-    .social-login-text::before {
-      left: 0;
-    }
-    
-    .social-login-text::after {
-      right: 0;
-    }
-    
-    .social-buttons {
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-    }
-    
-    .social-button {
+    .btn-primary {
+      width: 100%;
+      height: var(--button-height);
+      background: var(--ion-color-primary);
+      color: white;
+      border: none;
+      border-radius: var(--input-border-radius);
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      background-color: var(--ion-color-light);
-      color: white;
-      font-size: 20px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-      transition: transform 0.2s ease;
-      cursor: pointer;
+      gap: 8px;
+      
+      &:disabled {
+        background: var(--ion-color-medium);
+        cursor: not-allowed;
+      }
+      
+      .button-spinner {
+        width: 20px;
+        height: 20px;
+      }
     }
     
-    .social-button:hover {
-      transform: scale(1.05);
+    .social-login {
+      margin-top: 2rem;
+      text-align: center;
+      
+      .social-login-text {
+        color: var(--ion-color-medium);
+        margin-bottom: 1rem;
+        position: relative;
+        
+        &:before,
+        &:after {
+          content: '';
+          position: absolute;
+          top: 50%;
+          width: 25%;
+          height: 1px;
+          background: var(--ion-color-light-shade);
+        }
+        
+        &:before {
+          left: 0;
+        }
+        
+        &:after {
+          right: 0;
+        }
+      }
+      
+      .social-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        
+        .social-button {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 8px 16px;
+          border: 1px solid var(--ion-color-light-shade);
+          border-radius: var(--input-border-radius);
+          background: white;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          
+          ion-icon {
+            font-size: 1.25rem;
+          }
+          
+          &.google {
+            color: #DB4437;
+            &:hover {
+              background: #DB4437;
+              color: white;
+            }
+          }
+          
+          &:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+          }
+        }
+      }
     }
     
-    .social-button:nth-child(1) {
-      background-color: #1877f2; // Facebook
+    .password-requirements {
+      margin-top: 8px;
+      padding: 8px;
+      border-radius: var(--input-border-radius);
+      background: var(--ion-color-light);
+      
+      .requirement-text {
+        color: var(--ion-color-medium);
+        margin-bottom: 4px;
+        display: block;
+      }
+      
+      .requirements-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        
+        li {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          color: var(--ion-color-medium);
+          font-size: 0.875rem;
+          margin-bottom: 4px;
+          
+          ion-icon {
+            font-size: 1rem;
+          }
+          
+          &.met {
+            color: var(--ion-color-success);
+          }
+        }
+      }
     }
     
-    .social-button:nth-child(2) {
-      background-color: #db4437; // Google
+    @media (max-width: 480px) {
+      .auth-container {
+        padding: 16px;
+      }
+      
+      .social-login {
+        .social-buttons {
+          flex-direction: column;
+          
+          .social-button {
+            width: 100%;
+            justify-content: center;
+          }
+        }
+      }
     }
-    
-    .social-button:nth-child(3) {
-      background-color: #0a66c2; // LinkedIn
-    }
-    

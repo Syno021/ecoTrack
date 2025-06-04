@@ -37,23 +37,13 @@
       Track your environmental impact, dispose of waste properly, and help create a sustainable community.
       
       <div class="action-row">
-        <ion-button expand="block" fill="solid" color="light" routerLink="/auth">
+        <ion-button expand="block" fill="solid" class="get-started-btn" color="medium" routerLink="/auth">
           <ion-icon name="navigate-outline" slot="start"></ion-icon>
           Get Started
         </ion-button>
       </div>
     </ion-card-content>
   </ion-card>
-  
-  <!-- Stats Section -->
-  <div class="app-section animate-in" style="animation-delay: 0.1s">
-    <div class="eco-stats">
-      <div class="stat-item" *ngFor="let stat of stats">
-        <div class="stat-value">{{stat.value}}</div>
-        <div class="stat-label">{{stat.label}}</div>
-      </div>
-    </div>
-  </div>
   
   <!-- Features Section -->
   <div class="app-section animate-in" style="animation-delay: 0.2s">
@@ -117,9 +107,6 @@
       <ion-segment-button value="materials" class="segment-button">
         <ion-label>Materials</ion-label>
       </ion-segment-button>
-      <ion-segment-button value="faq" class="segment-button">
-        <ion-label>FAQ</ion-label>
-      </ion-segment-button>
     </ion-segment>
     
     <!-- Recycling Basics -->
@@ -144,21 +131,6 @@
           {{category.description}}
         </ion-card-content>
       </ion-card>
-    </div>
-    
-    <!-- FAQ Section -->
-    <div *ngIf="selectedRecyclingSegment === 'faq'">
-      <div class="accordion-group">
-        <div *ngFor="let faq of recyclingFAQs">
-          <div class="accordion-header" (click)="toggleFAQ(faq)">
-            <div class="accordion-title">{{faq.question}}</div>
-            <ion-icon [name]="faq.expanded ? 'chevron-up-outline' : 'chevron-down-outline'"></ion-icon>
-          </div>
-          <div class="accordion-content" *ngIf="faq.expanded">
-            {{faq.answer}}
-          </div>
-        </div>
-      </div>
     </div>
   </div>
   

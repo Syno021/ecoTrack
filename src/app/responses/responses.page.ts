@@ -4,7 +4,6 @@ import { ToastController, ModalController, LoadingController } from '@ionic/angu
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { Router } from '@angular/router';
-import firebase from 'firebase/compat/app';
 
 interface Report {
   id: string;

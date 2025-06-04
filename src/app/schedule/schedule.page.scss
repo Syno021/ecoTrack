@@ -30,7 +30,7 @@ ion-segment-button {
 .section-title {
   font-size: 1.1rem;
   font-weight: 500;
-  color: var(--ion-color-dark);
+  color: var(--ion-color-primary);
   margin-bottom: 10px;
   margin-top: 20px;
   padding-left: 8px;
@@ -200,6 +200,10 @@ ion-fab-button {
   --box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
 }
 
+span {
+  color: var(--ion-color-dark);
+}
+
 @media (prefers-color-scheme: dark) {
   .featured-card ion-card-header {
     background: linear-gradient(135deg, var(--ion-color-primary), var(--ion-color-primary-tint));
@@ -211,5 +215,9 @@ ion-fab-button {
   
   .expanded-details ion-card {
     border: 1px solid rgba(var(--ion-color-dark-rgb), 0.3);
+  }
+  
+  span {
+    color: var(--ion-color-light);
   }
 }

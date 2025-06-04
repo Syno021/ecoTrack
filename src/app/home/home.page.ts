@@ -86,29 +86,7 @@ export class HomePage implements OnInit {
       color: 'danger'
     }
   ];
-  
-  recyclingFAQs = [
-    {
-      question: 'What plastics can be recycled?',
-      answer: 'Most communities accept plastics with recycling numbers 1 (PET) and 2 (HDPE). Check the number inside the triangle symbol on the bottom of containers.',
-      expanded: false
-    },
-    {
-      question: 'Should I remove labels from containers?',
-      answer: 'It\'s not necessary to remove paper labels from containers. Modern recycling facilities can separate these materials during processing.',
-      expanded: false
-    },
-    {
-      question: 'Can I recycle pizza boxes?',
-      answer: 'Clean parts of pizza boxes can be recycled. Cut away and discard greasy or food-stained sections, as they contaminate the recycling process.',
-      expanded: false
-    },
-    {
-      question: 'What about bottle caps?',
-      answer: 'Best practice varies by location. Generally, plastic caps should be left on plastic bottles, while metal caps should be recycled separately with other metals.',
-      expanded: false
-    }
-  ];
+
 
   constructor(private platform: Platform) {}
 

@@ -3,20 +3,12 @@
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
   
-  <ion-segment [(ngModel)]="filter" (ionChange)="filterSchedules()" class="ion-margin-bottom">
-    <ion-segment-button value="all">
-      <ion-label>All</ion-label>
-    </ion-segment-button>
-    <ion-segment-button value="recyclable">
-      <ion-label>Recyclable</ion-label>
-    </ion-segment-button>
-    <ion-segment-button value="organic">
-      <ion-label>Organic</ion-label>
-    </ion-segment-button>
-    <ion-segment-button value="hazardous">
-      <ion-label>Hazardous</ion-label>
-    </ion-segment-button>
-  </ion-segment>
+  <ion-searchbar
+    [(ngModel)]="searchText"
+    (ionInput)="filterSchedules()"
+    placeholder="Search by area or waste type"
+    animated>
+  </ion-searchbar>
   
   <div class="upcoming-section" *ngIf="upcomingSchedule && isLoggedIn">
     <h4 class="section-title">Next Favorite Collection</h4>

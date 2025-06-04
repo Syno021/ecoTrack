@@ -34,7 +34,7 @@ export class SchedulePage implements OnInit {
   filteredSchedules: Schedule[] = [];
   upcomingSchedule: Schedule | null = null;
   selectedSchedule: Schedule | null = null;
-  filter: string = 'all';
+  searchText: string = '';
   currentUserId: string | null = null; // Change to public by removing private keyword
 
   // ...or alternatively, keep it private and add a public getter:
@@ -141,14 +141,16 @@ export class SchedulePage implements OnInit {
   }
 
   filterSchedules() {
-    if (this.filter === 'all') {
+    if (!this.searchText.trim()) {
       this.filteredSchedules = [...this.schedules];
-    } else {
-      const filterTerm = this.filter.toLowerCase();
-      this.filteredSchedules = this.schedules.filter(schedule => 
-        schedule.wasteType.toLowerCase().includes(filterTerm)
-      );
+      return;
     }
+    
+    const searchTerm = this.searchText.toLowerCase().trim();
+    this.filteredSchedules = this.schedules.filter(schedule => 
+      schedule.location.toLowerCase().includes(searchTerm) ||
+      schedule.wasteType.toLowerCase().includes(searchTerm)
+    );
   }
 
   findUpcomingSchedule() {

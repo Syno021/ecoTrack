@@ -38,7 +38,7 @@ interface SearchResult {
 @Component({
   selector: 'app-admin',
   templateUrl: './admin.page.html',
-  styleUrls: ['./admin.page.scss'],
+  styleUrls: ['./admin.page.scss','./admin.page2.scss'],
   standalone: false
 })
 export class AdminPage implements OnInit, OnDestroy, AfterViewInit {
@@ -139,8 +139,7 @@ export class AdminPage implements OnInit, OnDestroy, AfterViewInit {
       
       const isAdmin = await this.checkAdminStatus(user.uid);
       if (!isAdmin) {
-        this.router.navigate(['/home']);
-        this.presentToast('Access denied. Admin rights required.', 'warning');
+        this.router.navigate(['/manage-dump']);
         return;
       }
       

@@ -10,7 +10,7 @@ import { GoogleAuthProvider, FacebookAuthProvider, OAuthProvider, signInWithPopu
 @Component({
   selector: 'app-auth',
   templateUrl: './auth.page.html',
-  styleUrls: ['./auth.page.scss'],
+  styleUrls: ['./auth.page.scss','./auth.page2.scss'],
   standalone: false,
 })
 export class AuthPage implements OnInit {

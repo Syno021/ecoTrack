@@ -1,10 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, NgZone, Injector, runInInjectionContext } from '@angular/core';
 import { Platform } from '@ionic/angular';
+import { AngularFireAuth } from '@angular/fire/compat/auth';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.page.html',
-  styleUrls: ['./home.page.scss'],
+  styleUrls: ['./home.page.scss','./home.page2.scss'],
   standalone:false
 })
 export class HomePage implements OnInit {
@@ -88,10 +89,43 @@ export class HomePage implements OnInit {
   ];
 
 
-  constructor(private platform: Platform) {}
+  constructor(
+    private platform: Platform,
+    private fireAuth: AngularFireAuth,
+    private ngZone: NgZone,
+    private injector: Injector
+  ) {}
 
-  ngOnInit() {
+  async ngOnInit() {
     this.isWeb = this.platform.is('desktop') || this.platform.is('mobileweb');
+    await this.clearAllAuthData();
+  }
+
+  private async clearAllAuthData() {
+    try {
+      await this.ngZone.run(() => {
+        return runInInjectionContext(this.injector, async () => {
+          await this.fireAuth.signOut();
+          
+          // Clear all auth-related localStorage items
+          const authKeys = ['user-role', 'user-session', 'firebase:authUser', 'firebase:host'];
+          authKeys.forEach(key => {
+            localStorage.removeItem(key);
+            Object.keys(localStorage).forEach(storageKey => {
+              if (storageKey.includes(key) || storageKey.includes('firebase')) {
+                localStorage.removeItem(storageKey);
+              }
+            });
+          });
+          
+          sessionStorage.clear();
+        });
+      });
+      
+      console.log('Auth state cleared on home page load');
+    } catch (error) {
+      console.error('Error clearing auth state:', error);
+    }
   }
   
   segmentChanged(event: any) {
